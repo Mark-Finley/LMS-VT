@@ -29,5 +29,23 @@ class RequestedTestViewSet(viewsets.ModelViewSet):
     serializer_class = RequestedTestSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def perform_create(self, serializer):
+        instance = serializer.save(
+            created_by=self.request.user,
+            updated_by=self.request.user
+        )
+        if hasattr(instance.request, 'invoice'):
+            instance.request.invoice.save()
+
     def perform_update(self, serializer):
-        serializer.save(updated_by=self.request.user)
+        instance = serializer.save(updated_by=self.request.user)
+        if hasattr(instance.request, 'invoice'):
+            instance.request.invoice.save()
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        test_request = instance.request
+        response = super().destroy(request, *args, **kwargs)
+        if hasattr(test_request, 'invoice'):
+            test_request.invoice.save()
+        return response

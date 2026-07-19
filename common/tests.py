@@ -258,3 +258,53 @@ class Phase2LMSWorkflowTestCase(TestCase):
         self.assertEqual(pv.flag, 'N')
         self.assertEqual(result.parameter_values.count(), 1)
 
+    def test_delete_requested_test_invoice_recalculation(self):
+        from billing.models import Invoice
+        
+        # 1. Create Invoice manually for the test request (since setUp used ORM create bypassing serializer)
+        invoice = Invoice.objects.create(
+            request=self.test_request,
+            patient=self.patient,
+            created_by=self.user,
+            updated_by=self.user
+        )
+        invoice.save()
+        self.assertEqual(invoice.total_amount, 150.00)
+        
+        # 2. Add another test
+        test2 = Test.objects.create(
+            category=self.category,
+            name='Second Test',
+            code='ST2',
+            price=50.00,
+            turnaround_time_hours=12,
+            sample_type='Urine'
+        )
+        
+        from django.test import Client
+        import json
+        client = Client()
+        client.force_login(self.user)
+        
+        from django.urls import reverse
+        add_url = reverse('requestedtest-list')
+        response = client.post(add_url, json.dumps({
+            'request': self.test_request.id,
+            'test': test2.id
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        
+        # Verify invoice total updated
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.total_amount, 200.00)
+        
+        # 3. Now delete the test via API client
+        created_rt_id = response.data['id']
+        delete_url = reverse('requestedtest-detail', args=[created_rt_id])
+        response = client.delete(delete_url)
+        self.assertEqual(response.status_code, 204)
+        
+        # Verify invoice total updated back to 150.00
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.total_amount, 150.00)
+

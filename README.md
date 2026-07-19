@@ -4,7 +4,7 @@ A robust, modern web-based Diagnostic Laboratory Information Management System (
 
 ---
 
-## 🌟 Key Features & Modules
+##  Key Features & Modules
 
 ### 1. Reception & Patient Registration
 - Swift registration of patient demographics.
@@ -44,7 +44,7 @@ A robust, modern web-based Diagnostic Laboratory Information Management System (
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 - **Backend Framework**: Django 5.x (Python)
 - **Database**: MySQL 8.0
 - **Frontend Layer**: Alpine.js, Tailwind CSS, Vanilla JS
@@ -53,7 +53,7 @@ A robust, modern web-based Diagnostic Laboratory Information Management System (
 
 ---
 
-## 🚀 Quick Start & Installation
+##  Quick Start & Installation
 
 ### 1. Prerequisites
 - Python 3.10+

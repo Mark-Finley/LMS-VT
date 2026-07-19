@@ -109,6 +109,14 @@
                         </svg>
                         <span>Reception & Patients</span>
                     </button>
+                    <button @click="currentTab = 'booked_visits'; fetchBookedVisits();" 
+                            :class="currentTab === 'booked_visits' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+                            class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4v3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Booked Visits</span>
+                    </button>
                     <button @click="currentTab = 'billing'" 
                             :class="currentTab === 'billing' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
@@ -1668,6 +1676,112 @@
                     </div>
                 </div>
             </section>
+
+            <!-- 14. BOOKED VISITS PANEL (PENDING PAYMENT) -->
+            <section x-show="currentTab === 'booked_visits'" class="space-y-6" x-cloak>
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+                    <h2 class="text-xl font-extrabold text-white text-left">Booked Visits Pending Payment</h2>
+                    <p class="text-slate-400 text-xs mt-1 text-left">View patient visits awaiting payment processing. Edit or recall/cancel ordered tests before collection.</p>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+                    <div class="overflow-x-auto max-h-160">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
+                                <tr>
+                                    <th class="py-3">Requisition No</th>
+                                    <th class="py-3">Patient</th>
+                                    <th class="py-3">Date Booked</th>
+                                    <th class="py-3">Tests Count</th>
+                                    <th class="py-3">Payable Amount</th>
+                                    <th class="py-3">Payment Status</th>
+                                    <th class="py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="v in bookedVisitsList" :key="v.id">
+                                    <tr class="border-b border-slate-800/50 hover:bg-slate-800/20">
+                                        <td class="py-4 font-mono font-bold text-indigo-400" x-text="v.request_number"></td>
+                                        <td class="py-4 text-slate-200 font-semibold" x-text="v.encounter_detail ? v.encounter_detail.patient_detail.full_name : 'Unknown'"></td>
+                                        <td class="py-4 text-slate-400 text-xs" x-text="new Date(v.created_at).toLocaleString()"></td>
+                                        <td class="py-4 text-slate-300 font-bold" x-text="v.requested_tests ? v.requested_tests.length : 0"></td>
+                                        <td class="py-4 text-emerald-400 font-extrabold" x-text="v.invoice ? 'GH₵' + v.invoice.payable_amount : 'GH₵0.00'"></td>
+                                        <td class="py-4">
+                                            <span class="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase"
+                                                  :class="v.payment_status === 'partial' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'">
+                                                <span x-text="v.payment_status"></span>
+                                            </span>
+                                        </td>
+                                        <td class="py-4 text-right">
+                                            <button @click="recallOrder(v)" class="px-3 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
+                                                Recall & Edit
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                                <tr x-show="bookedVisitsList.length === 0">
+                                    <td colspan="7" class="py-6 text-center text-slate-500">No booked visits pending payment.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recall / Edit Order Modal -->
+                <div x-show="showRecallModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" x-cloak>
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                            <h3 class="text-lg font-bold text-white text-left">Recall & Edit Diagnostic Order</h3>
+                            <button @click="showRecallModal = false" class="text-slate-400 hover:text-white">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2 text-xs text-slate-400 text-left bg-slate-950/40 p-3 rounded-xl">
+                            <div>Requisition: <span class="font-bold text-indigo-400" x-text="selectedRecallVisit ? selectedRecallVisit.request_number : ''"></span></div>
+                            <div>Patient: <span class="font-bold text-white" x-text="selectedRecallVisit && selectedRecallVisit.encounter_detail ? selectedRecallVisit.encounter_detail.patient_detail.full_name : ''"></span></div>
+                            <div>Total Payable: <span class="font-bold text-emerald-400" x-text="selectedRecallVisit && selectedRecallVisit.invoice ? 'GH₵' + selectedRecallVisit.invoice.payable_amount : 'GH₵0.00'"></span></div>
+                            <div>Paid Amount: <span class="font-bold text-slate-300" x-text="selectedRecallVisit && selectedRecallVisit.invoice ? 'GH₵' + selectedRecallVisit.invoice.paid_amount : 'GH₵0.00'"></span></div>
+                        </div>
+
+                        <!-- Current Ordered Tests List -->
+                        <div class="space-y-2">
+                            <p class="text-xs font-bold text-slate-300 text-left uppercase tracking-wider">Currently Ordered Tests</p>
+                            <div class="space-y-2 max-h-48 overflow-y-auto bg-slate-800/40 p-3 rounded-xl border border-slate-700/30">
+                                <template x-for="rt in (selectedRecallVisit ? selectedRecallVisit.requested_tests : [])" :key="rt.id">
+                                    <div class="flex justify-between items-center border-b border-slate-800 pb-2 last:border-0 last:pb-0">
+                                        <div class="text-left">
+                                            <span class="text-xs font-bold text-white" x-text="rt.test_detail.name"></span>
+                                            <span class="block text-[10px] text-slate-400" x-text="'Price: GH₵' + rt.price_at_request + ' | Status: ' + rt.status"></span>
+                                        </div>
+                                        <button @click="deleteOrderedTest(rt.id)" 
+                                                :disabled="rt.status !== 'pending'"
+                                                class="px-2 py-1 bg-rose-500/20 hover:bg-rose-600 text-rose-400 hover:text-white rounded text-[10px] font-bold border border-rose-500/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                                            Cancel Test
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Add Test Section -->
+                        <div class="space-y-2 border-t border-slate-800 pt-3">
+                            <p class="text-xs font-bold text-slate-300 text-left uppercase tracking-wider">Add Test to Order</p>
+                            <div class="flex gap-2">
+                                <select x-model="newRecallTestId" class="flex-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white">
+                                    <option value="">-- Select Test --</option>
+                                    <template x-for="t in catalogueTests" :key="t.id">
+                                        <option :value="t.id" x-text="t.name + ' (GH₵' + t.price + ')'"></option>
+                                    </template>
+                                </select>
+                                <button @click="addTestToOrder()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
+                                    Add Test
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -1776,6 +1890,10 @@
                 newTestForm: { name: '', code: '', price: 0.00, category: '', turnaround_time_hours: 4, sample_type: 'Serum', normal_range: 'See parameters', units: 'n/a' },
                 newParamForm: { name: '', normal_range: 'Normal', units: 'n/a' },
                 specimenTypesList: [],
+                bookedVisitsList: [],
+                showRecallModal: false,
+                selectedRecallVisit: null,
+                newRecallTestId: '',
 
                 metrics: {
                     today_patients: 0,
@@ -2449,6 +2567,73 @@
                         this.showNewParamModal = false;
                         this.newParamForm = { name: '', normal_range: 'Normal', units: 'n/a' };
                         this.fetchCatalogue();
+                    });
+                },
+                fetchBookedVisits(refreshModalId = null) {
+                    fetch('/api/test-requests/')
+                        .then(r => r.json())
+                        .then(data => {
+                            data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                            this.bookedVisitsList = data.filter(v => v.payment_status !== 'paid');
+                            if (refreshModalId) {
+                                let updated = this.bookedVisitsList.find(v => v.id === refreshModalId);
+                                if (updated) {
+                                    this.selectedRecallVisit = updated;
+                                } else {
+                                    this.showRecallModal = false;
+                                    this.selectedRecallVisit = null;
+                                }
+                            }
+                        });
+                },
+                recallOrder(visit) {
+                    this.selectedRecallVisit = JSON.parse(JSON.stringify(visit));
+                    this.newRecallTestId = '';
+                    this.showRecallModal = true;
+                    // Also fetch catalogue if empty
+                    if (this.catalogueTests.length === 0) {
+                        this.fetchCatalogue();
+                    }
+                },
+                deleteOrderedTest(rtId) {
+                    if (!confirm('Are you sure you want to cancel/delete this test from the order?')) return;
+                    fetch(`/api/requested-tests/${rtId}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            alert('Ordered test cancelled/removed successfully.');
+                            this.fetchBookedVisits(this.selectedRecallVisit.id);
+                        } else {
+                            alert('Failed to remove ordered test.');
+                        }
+                    });
+                },
+                addTestToOrder() {
+                    if (!this.newRecallTestId) {
+                        alert('Please select a test to add.');
+                        return;
+                    }
+                    let data = {
+                        request: this.selectedRecallVisit.id,
+                        test: this.newRecallTestId
+                    };
+                    fetch('/api/requested-tests/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(r => r.json())
+                    .then(res => {
+                        alert('Test added to order successfully.');
+                        this.newRecallTestId = '';
+                        this.fetchBookedVisits(this.selectedRecallVisit.id);
                     });
                 }
             }
