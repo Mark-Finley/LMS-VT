@@ -287,7 +287,7 @@ class Phase2LMSWorkflowTestCase(TestCase):
         client.force_login(self.user)
         
         from django.urls import reverse
-        add_url = reverse('requestedtest-list')
+        add_url = reverse('requested-tests-list')
         response = client.post(add_url, json.dumps({
             'request': self.test_request.id,
             'test': test2.id
@@ -300,7 +300,7 @@ class Phase2LMSWorkflowTestCase(TestCase):
         
         # 3. Now delete the test via API client
         created_rt_id = response.data['id']
-        delete_url = reverse('requestedtest-detail', args=[created_rt_id])
+        delete_url = reverse('requested-tests-detail', args=[created_rt_id])
         response = client.delete(delete_url)
         self.assertEqual(response.status_code, 204)
         
