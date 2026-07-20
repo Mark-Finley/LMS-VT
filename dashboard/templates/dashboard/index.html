@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" x-data="lmsApp()">
+<html lang="en" x-data="lmsApp()" :class="isDarkThemeActive ? 'dark' : 'light'">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,8 +27,116 @@
         body {
             background-color: #0f172a;
             color: #f1f5f9;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         [x-cloak] { display: none !important; }
+
+        /* Light Theme Overrides */
+        html.light body {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        html.light .bg-slate-900 {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        html.light .border-slate-800 {
+            border-color: #e2e8f0 !important;
+        }
+        html.light .text-slate-400 {
+            color: #64748b !important;
+        }
+        html.light .text-slate-300 {
+            color: #334155 !important;
+        }
+        html.light .text-slate-200 {
+            color: #1e293b !important;
+        }
+        html.light .text-white {
+            color: #0f172a !important;
+        }
+        html.light .bg-slate-800 {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+        }
+        html.light .bg-slate-800\/50 {
+            background-color: #f8fafc !important;
+        }
+        html.light .bg-slate-800\/40 {
+            background-color: #f1f5f9 !important;
+        }
+        html.light .bg-slate-800\/80 {
+            background-color: #e2e8f0 !important;
+        }
+        html.light .bg-slate-900\/50 {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+        }
+        html.light .bg-slate-950 {
+            background-color: #ffffff !important;
+            border-color: #cbd5e1 !important;
+        }
+        html.light .bg-slate-950\/40 {
+            background-color: #f8fafc !important;
+        }
+        html.light .bg-slate-950\/80 {
+            background-color: rgba(15, 23, 42, 0.6) !important;
+        }
+        html.light .border-slate-700 {
+            border-color: #cbd5e1 !important;
+        }
+        html.light .border-slate-700\/30 {
+            border-color: #cbd5e1 !important;
+        }
+        html.light .border-slate-700\/50 {
+            border-color: #cbd5e1 !important;
+        }
+        html.light input, html.light select, html.light textarea {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+        html.light input:focus, html.light select:focus, html.light textarea:focus {
+            border-color: #4f46e5 !important;
+        }
+        html.light aside {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+        }
+        html.light header {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+        html.light header p.text-slate-200 {
+            color: #0f172a !important;
+        }
+        html.light header p.text-indigo-400 {
+            color: #4f46e5 !important;
+        }
+        html.light header span.text-white {
+            color: #0f172a !important;
+        }
+        html.light .hover\:bg-slate-800:hover {
+            background-color: #f1f5f9 !important;
+        }
+        html.light .bg-slate-800\/20:hover {
+            background-color: #f1f5f9 !important;
+        }
+        html.light table th {
+            color: #475569 !important;
+            border-color: #e2e8f0 !important;
+        }
+        html.light table td {
+            color: #334155 !important;
+            border-color: #f1f5f9 !important;
+        }
+        html.light footer {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            color: #64748b !important;
+        }
     </style>
 </head>
 <body class="min-h-screen font-sans flex flex-col">
@@ -47,6 +155,31 @@
         </div>
 
         <div class="flex items-center space-x-4">
+            <!-- Theme Switcher -->
+            <div class="flex items-center space-x-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700/50 mr-2">
+                <button @click="setTheme('light')" 
+                        :class="themeMode === 'light' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-700/40'"
+                        class="p-1.5 rounded-lg transition-all text-xs font-bold flex items-center justify-center" title="Light Mode">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
+                    </svg>
+                </button>
+                <button @click="setTheme('dark')" 
+                        :class="themeMode === 'dark' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-700/40'"
+                        class="p-1.5 rounded-lg transition-all text-xs font-bold flex items-center justify-center" title="Dark Mode">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+                <button @click="setTheme('system')" 
+                        :class="themeMode === 'system' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-700/40'"
+                        class="p-1.5 rounded-lg transition-all text-xs font-bold flex items-center justify-center" title="System Theme">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                </button>
+            </div>
+
             <div class="text-right hidden md:block">
                 <p class="text-sm font-semibold text-slate-200">{{ user.get_full_name|default:user.username }}</p>
                 <p class="text-xs text-indigo-400 font-bold capitalize">{{ user.get_role_display }}</p>
@@ -1910,6 +2043,18 @@
                     }
                     return 'overview';
                 },
+                themeMode: localStorage.getItem('themeMode') || 'system',
+                systemPrefersDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
+                get isDarkThemeActive() {
+                    if (this.themeMode === 'system') {
+                        return this.systemPrefersDark;
+                    }
+                    return this.themeMode === 'dark';
+                },
+                setTheme(theme) {
+                    this.themeMode = theme;
+                    localStorage.setItem('themeMode', theme);
+                },
                 doctorRequestsList: [],
                 patientProfile: {},
                 patientResultsList: [],
@@ -1991,6 +2136,11 @@
                         } else if (val === 'equipment') {
                             this.fetchEquipment();
                         }
+                    });
+
+                    // Sync system theme changes dynamically
+                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                        this.systemPrefersDark = e.matches;
                     });
                 },
 
