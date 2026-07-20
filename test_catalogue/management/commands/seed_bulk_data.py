@@ -51,11 +51,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         num_patients = options['count']
-        self.stdout.write(self.style.WARNING(f"Starting bulk data seeding for ~{num_patients} patients and linked records..."))
 
         # Ensure seed_data has run first
         from django.core.management import call_command
         call_command('seed_data')
+
+        if Patient.objects.count() >= 20:
+            self.stdout.write(self.style.SUCCESS("Database already contains seeded patients and laboratory records. Skipping bulk seed."))
+            return
+
+        self.stdout.write(self.style.WARNING(f"Starting bulk data seeding for ~{num_patients} patients and linked records..."))
 
         users = list(User.objects.all())
         staff_users = [u for u in users if u.role not in [User.ROLE_PATIENT, User.ROLE_DOCTOR]] or users
