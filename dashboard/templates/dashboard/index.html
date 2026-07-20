@@ -1913,6 +1913,8 @@
                 },
 
                 init() {
+                    let savedTab = localStorage.getItem('activeTab');
+                    
                     if (this.userRole === 'doctor') {
                         this.currentTab = 'doctor_dashboard';
                         this.fetchDoctorDashboard();
@@ -1920,10 +1922,51 @@
                         this.currentTab = 'patient_dashboard';
                         this.fetchPatientDashboard();
                     } else {
+                        if (savedTab && savedTab !== 'doctor_dashboard' && savedTab !== 'patient_dashboard') {
+                            this.currentTab = savedTab;
+                        } else {
+                            this.currentTab = 'overview';
+                        }
+                        
                         this.fetchPatients();
                         this.fetchMetrics();
                         this.fetchResults();
+                        
+                        // Trigger specific fetches on reload for the active tab
+                        if (this.currentTab === 'booked_visits') {
+                            this.fetchBookedVisits();
+                        } else if (this.currentTab === 'referrals') {
+                            this.fetchReferrals();
+                        } else if (this.currentTab === 'catalogue') {
+                            this.fetchCatalogue();
+                        } else if (this.currentTab === 'quality') {
+                            this.fetchNC();
+                            this.fetchQC();
+                        } else if (this.currentTab === 'inventory') {
+                            this.fetchInventory();
+                        } else if (this.currentTab === 'equipment') {
+                            this.fetchEquipment();
+                        }
                     }
+
+                    this.$watch('currentTab', val => {
+                        localStorage.setItem('activeTab', val);
+                        
+                        if (val === 'booked_visits') {
+                            this.fetchBookedVisits();
+                        } else if (val === 'referrals') {
+                            this.fetchReferrals();
+                        } else if (val === 'catalogue') {
+                            this.fetchCatalogue();
+                        } else if (val === 'quality') {
+                            this.fetchNC();
+                            this.fetchQC();
+                        } else if (val === 'inventory') {
+                            this.fetchInventory();
+                        } else if (val === 'equipment') {
+                            this.fetchEquipment();
+                        }
+                    });
                 },
 
                 fetchMetrics() {
