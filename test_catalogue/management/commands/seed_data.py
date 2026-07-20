@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from test_catalogue.models import TestCategory, Test
+from test_catalogue.models import TestCategory, Test, TestParameter
 from django.db import transaction
 
 User = get_user_model()
