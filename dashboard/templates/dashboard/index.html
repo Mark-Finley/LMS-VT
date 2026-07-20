@@ -93,7 +93,7 @@
 
                 <!-- Standard Staff Navigation -->
                 <div x-show="userRole !== 'doctor' && userRole !== 'patient'" class="space-y-1">
-                    <button @click="currentTab = 'overview'" 
+                    <button x-show="hasTabAccess('overview')" @click="currentTab = 'overview'" 
                             :class="currentTab === 'overview' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -101,7 +101,7 @@
                         </svg>
                         <span>Overview Dashboard</span>
                     </button>
-                    <button @click="currentTab = 'reception'" 
+                    <button x-show="hasTabAccess('reception')" @click="currentTab = 'reception'" 
                             :class="currentTab === 'reception' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -109,7 +109,7 @@
                         </svg>
                         <span>Reception & Patients</span>
                     </button>
-                    <button @click="currentTab = 'booked_visits'; fetchBookedVisits();" 
+                    <button x-show="hasTabAccess('booked_visits')" @click="currentTab = 'booked_visits'; fetchBookedVisits();" 
                             :class="currentTab === 'booked_visits' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -117,7 +117,7 @@
                         </svg>
                         <span>Booked Visits</span>
                     </button>
-                    <button @click="currentTab = 'billing'" 
+                    <button x-show="hasTabAccess('billing')" @click="currentTab = 'billing'" 
                             :class="currentTab === 'billing' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -125,7 +125,7 @@
                         </svg>
                         <span>Cashier & Billing</span>
                     </button>
-                    <button @click="currentTab = 'phlebotomy'" 
+                    <button x-show="hasTabAccess('phlebotomy')" @click="currentTab = 'phlebotomy'" 
                             :class="currentTab === 'phlebotomy' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -133,7 +133,7 @@
                         </svg>
                         <span>Phlebotomy (Samples)</span>
                     </button>
-                    <button @click="currentTab = 'testing'" 
+                    <button x-show="hasTabAccess('testing')" @click="currentTab = 'testing'" 
                             :class="currentTab === 'testing' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -141,7 +141,7 @@
                         </svg>
                         <span>Lab Testing (Results)</span>
                     </button>
-                    <button @click="currentTab = 'pathology'" 
+                    <button x-show="hasTabAccess('pathology')" @click="currentTab = 'pathology'" 
                             :class="currentTab === 'pathology' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -149,54 +149,54 @@
                         </svg>
                         <span>Pathology Verification</span>
                     </button>
-                <button @click="currentTab = 'inventory'; fetchReagents();" 
-                        :class="currentTab === 'inventory' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
-                        class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                    </svg>
-                    <span>Inventory & Reagents</span>
-                </button>
-                <button @click="currentTab = 'equipment'; fetchEquipment();" 
-                        :class="currentTab === 'equipment' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
-                        class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    <span>Analyzers & Equipment</span>
-                </button>
-                <button @click="currentTab = 'quality'; fetchQc(); fetchNC();" 
-                        :class="currentTab === 'quality' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
-                        class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
-                    </svg>
-                    <span>Quality Control (QC)</span>
-                </button>
-                <button @click="currentTab = 'referrals'; fetchReferrals();" 
-                        :class="currentTab === 'referrals' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
-                        class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                    </svg>
-                    <span>Partner Referrals</span>
-                </button>
-                <button @click="currentTab = 'catalogue'; fetchCatalogue();" 
-                        :class="currentTab === 'catalogue' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
-                        class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                    </svg>
-                    <span>Test Catalogue</span>
-                </button>
+                    <button x-show="hasTabAccess('inventory')" @click="currentTab = 'inventory'; fetchReagents();" 
+                            :class="currentTab === 'inventory' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+                            class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                        <span>Inventory & Reagents</span>
+                    </button>
+                    <button x-show="hasTabAccess('equipment')" @click="currentTab = 'equipment'; fetchEquipment();" 
+                            :class="currentTab === 'equipment' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+                            class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span>Analyzers & Equipment</span>
+                    </button>
+                    <button x-show="hasTabAccess('quality')" @click="currentTab = 'quality'; fetchQc(); fetchNC();" 
+                            :class="currentTab === 'quality' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+                            class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                        </svg>
+                        <span>Quality Control (QC)</span>
+                    </button>
+                    <button x-show="hasTabAccess('referrals')" @click="currentTab = 'referrals'; fetchReferrals();" 
+                            :class="currentTab === 'referrals' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+                            class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                        </svg>
+                        <span>Partner Referrals</span>
+                    </button>
+                    <button x-show="hasTabAccess('catalogue')" @click="currentTab = 'catalogue'; fetchCatalogue();" 
+                            :class="currentTab === 'catalogue' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+                            class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                        <span>Test Catalogue</span>
+                    </button>
             </nav>
         </aside>
 
         <!-- Main Portal Container -->
         <main class="flex-1 p-6 md:p-8 space-y-8 overflow-y-auto">
             <!-- 1. OVERVIEW DASHBOARD PANEL -->
-            <section x-show="currentTab === 'overview'" class="space-y-8">
+            <section x-show="currentTab === 'overview' && hasTabAccess('overview')" class="space-y-8">
                 <!-- Metrics Card Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center space-x-4">
@@ -322,7 +322,7 @@
             </section>
 
             <!-- 2. RECEPTION & PATIENT REGISTRATION -->
-            <section x-show="currentTab === 'reception'" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <section x-show="currentTab === 'reception' && hasTabAccess('reception')" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Registration Form -->
                 <div class="lg:col-span-1 bg-slate-900 border border-slate-800 rounded-3xl p-6 h-fit">
                     <h2 class="text-lg font-bold text-white mb-6">Register Patient & Create Visit</h2>
@@ -460,7 +460,7 @@
             </section>
 
             <!-- 3. BILLING & INVOICES -->
-            <section x-show="currentTab === 'billing'" class="space-y-6">
+            <section x-show="currentTab === 'billing' && hasTabAccess('billing')" class="space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
                     <h2 class="text-lg font-bold text-white mb-6">Cashier Desk - Pending Invoices</h2>
                     <div class="overflow-x-auto">
@@ -552,7 +552,7 @@
             </section>
 
             <!-- 4. PHLEBOTOMY / SAMPLE COLLECTION -->
-            <section x-show="currentTab === 'phlebotomy'" class="space-y-6">
+            <section x-show="currentTab === 'phlebotomy' && hasTabAccess('phlebotomy')" class="space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
                     <h2 class="text-lg font-bold text-white mb-6">Specimen Collection Area (Phlebotomy)</h2>
                     <div class="overflow-x-auto">
@@ -637,7 +637,7 @@
             </section>
 
             <!-- 5. LAB TESTING (RESULTS ENTRY) -->
-            <section x-show="currentTab === 'testing'" class="space-y-6">
+            <section x-show="currentTab === 'testing' && hasTabAccess('testing')" class="space-y-6">
                 <!-- Samples in Lab -->
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
                     <h2 class="text-lg font-bold text-white mb-6">Specimens Received in Laboratory</h2>
@@ -769,7 +769,7 @@
             </section>
 
             <!-- 6. PATHOLOGY VERIFICATION -->
-            <section x-show="currentTab === 'pathology'" class="space-y-6">
+            <section x-show="currentTab === 'pathology' && hasTabAccess('pathology')" class="space-y-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
                     <h2 class="text-lg font-bold text-white mb-6">Pathologist Desk - Results Verification</h2>
                     <div class="overflow-x-auto">
@@ -825,7 +825,7 @@
             </section>
 
             <!-- 7. INVENTORY PANEL -->
-            <section x-show="currentTab === 'inventory'" class="space-y-6" x-cloak>
+            <section x-show="currentTab === 'inventory' && hasTabAccess('inventory')" class="space-y-6" x-cloak>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Register Reagent Form -->
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 h-fit">
@@ -937,7 +937,7 @@
             </section>
 
             <!-- 8. EQUIPMENT PANEL -->
-            <section x-show="currentTab === 'equipment'" class="space-y-6" x-cloak>
+            <section x-show="currentTab === 'equipment' && hasTabAccess('equipment')" class="space-y-6" x-cloak>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Register Analyzer -->
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 h-fit">
@@ -1057,7 +1057,7 @@
             </section>
 
             <!-- 9. QUALITY CONTROL PANEL -->
-            <section x-show="currentTab === 'quality'" class="space-y-6" x-cloak>
+            <section x-show="currentTab === 'quality' && hasTabAccess('quality')" class="space-y-6" x-cloak>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Register QC Control Lot -->
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 h-fit">
@@ -1240,7 +1240,7 @@
             </section>
 
             <!-- 10. REFERRALS PANEL -->
-            <section x-show="currentTab === 'referrals'" class="space-y-6" x-cloak>
+            <section x-show="currentTab === 'referrals' && hasTabAccess('referrals')" class="space-y-6" x-cloak>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Register Referral Partner -->
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 h-fit">
@@ -1354,7 +1354,7 @@
             </section>
 
             <!-- 11. DOCTOR DASHBOARD PANEL -->
-            <section x-show="currentTab === 'doctor_dashboard'" class="space-y-6" x-cloak>
+            <section x-show="currentTab === 'doctor_dashboard' && hasTabAccess('doctor_dashboard')" class="space-y-6" x-cloak>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Order Lab Tests Form -->
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 h-fit">
@@ -1449,7 +1449,7 @@
             </section>
 
             <!-- 12. PATIENT PORTAL PANEL -->
-            <section x-show="currentTab === 'patient_dashboard'" class="space-y-6" x-cloak>
+            <section x-show="currentTab === 'patient_dashboard' && hasTabAccess('patient_dashboard')" class="space-y-6" x-cloak>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Patient Profile Details Card -->
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 h-fit">
@@ -1545,7 +1545,7 @@
             </section>
 
             <!-- 13. TEST CATALOGUE PANEL -->
-            <section x-show="currentTab === 'catalogue'" class="space-y-6" x-cloak>
+            <section x-show="currentTab === 'catalogue' && hasTabAccess('catalogue')" class="space-y-6" x-cloak>
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 border border-slate-800 rounded-3xl p-6">
                     <div>
                         <h2 class="text-xl font-extrabold text-white text-left">Diagnostic Test Catalogue</h2>
@@ -1678,7 +1678,7 @@
             </section>
 
             <!-- 14. BOOKED VISITS PANEL (PENDING PAYMENT) -->
-            <section x-show="currentTab === 'booked_visits'" class="space-y-6" x-cloak>
+            <section x-show="currentTab === 'booked_visits' && hasTabAccess('booked_visits')" class="space-y-6" x-cloak>
                 <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
                     <h2 class="text-xl font-extrabold text-white text-left">Booked Visits Pending Payment</h2>
                     <p class="text-slate-400 text-xs mt-1 text-left">View patient visits awaiting payment processing. Edit or recall/cancel ordered tests before collection.</p>
@@ -1885,6 +1885,31 @@
 
                 // Phase 3 Variables
                 userRole: '{{ user.role }}',
+                roleAllowedTabs: {
+                    'administrator': ['overview', 'reception', 'booked_visits', 'billing', 'phlebotomy', 'testing', 'pathology', 'inventory', 'equipment', 'quality', 'referrals', 'catalogue'],
+                    'laboratory_manager': ['overview', 'reception', 'booked_visits', 'billing', 'phlebotomy', 'testing', 'pathology', 'inventory', 'equipment', 'quality', 'referrals', 'catalogue'],
+                    'receptionist': ['reception', 'booked_visits', 'referrals', 'catalogue'],
+                    'cashier': ['billing', 'booked_visits'],
+                    'laboratory_technician': ['phlebotomy', 'testing', 'equipment'],
+                    'laboratory_scientist': ['phlebotomy', 'testing', 'pathology', 'equipment'],
+                    'pathologist': ['pathology', 'testing', 'quality'],
+                    'store_officer': ['inventory', 'equipment'],
+                    'quality_officer': ['quality', 'equipment', 'pathology'],
+                    'doctor': ['doctor_dashboard'],
+                    'patient': ['patient_dashboard']
+                },
+                hasTabAccess(tabName) {
+                    let allowed = this.roleAllowedTabs[this.userRole];
+                    if (!allowed) return true;
+                    return allowed.includes(tabName);
+                },
+                getDefaultTabForRole() {
+                    let allowed = this.roleAllowedTabs[this.userRole];
+                    if (allowed && allowed.length > 0) {
+                        return allowed[0];
+                    }
+                    return 'overview';
+                },
                 doctorRequestsList: [],
                 patientProfile: {},
                 patientResultsList: [],
@@ -1922,10 +1947,10 @@
                         this.currentTab = 'patient_dashboard';
                         this.fetchPatientDashboard();
                     } else {
-                        if (savedTab && savedTab !== 'doctor_dashboard' && savedTab !== 'patient_dashboard') {
+                        if (savedTab && this.hasTabAccess(savedTab)) {
                             this.currentTab = savedTab;
                         } else {
-                            this.currentTab = 'overview';
+                            this.currentTab = this.getDefaultTabForRole();
                         }
                         
                         this.fetchPatients();
