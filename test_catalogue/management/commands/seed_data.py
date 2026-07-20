@@ -44,9 +44,11 @@ class Command(BaseCommand):
         import openpyxl
         import re
         import os
-        from test_catalogue.models import TestParameter
+        from django.conf import settings
+        excel_path = os.path.join(settings.BASE_DIR, "Lab_Results_Template.xlsx")
+        if not os.path.exists(excel_path):
+            excel_path = r"c:\Users\HP\Desktop\LMS\Lab_Results_Template.xlsx"
 
-        excel_path = r"c:\Users\HP\Desktop\LMS\Lab_Results_Template.xlsx"
         if os.path.exists(excel_path):
             wb = openpyxl.load_workbook(excel_path)
             ws = wb['Lab Results']
