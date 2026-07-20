@@ -2615,7 +2615,7 @@
                     .then(response => {
                         if (response.ok) {
                             alert('Ordered test cancelled/removed successfully.');
-                            this.fetchBookedVisits(this.selectedRecallVisit.id);
+                            window.location.reload();
                         } else {
                             alert('Failed to remove ordered test.');
                         }
@@ -2642,7 +2642,7 @@
                     .then(res => {
                         alert('Test added to order successfully.');
                         this.newRecallTestId = '';
-                        this.fetchBookedVisits(this.selectedRecallVisit.id);
+                        window.location.reload();
                     });
                 },
                 cancelEntireVisit(visitId) {
@@ -2659,7 +2659,7 @@
                             alert('Entire visit order cancelled successfully.');
                             this.showRecallModal = false;
                             this.selectedRecallVisit = null;
-                            this.fetchBookedVisits();
+                            window.location.reload();
                         } else {
                             alert('Failed to cancel the visit order.');
                         }
