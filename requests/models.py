@@ -49,8 +49,12 @@ class TestRequest(BaseModel):
             import datetime
             import random
             date_str = datetime.datetime.now().strftime("%Y%m%d")
-            rand_str = ''.join(random.choices("0123456789", k=4))
-            self.request_number = f"REQ-{date_str}-{rand_str}"
+            while True:
+                rand_str = ''.join(random.choices("0123456789", k=6))
+                candidate = f"REQ-{date_str}-{rand_str}"
+                if not TestRequest.objects.filter(request_number=candidate).exists():
+                    self.request_number = candidate
+                    break
         super().save(*args, **kwargs)
 
     def __str__(self):

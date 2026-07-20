@@ -119,8 +119,12 @@ class Receipt(BaseModel):
             import datetime
             import random
             date_str = datetime.datetime.now().strftime("%Y%m%d")
-            rand_str = ''.join(random.choices("0123456789", k=5))
-            self.receipt_number = f"REC-{date_str}-{rand_str}"
+            while True:
+                rand_str = ''.join(random.choices("0123456789", k=6))
+                candidate = f"REC-{date_str}-{rand_str}"
+                if not Receipt.objects.filter(receipt_number=candidate).exists():
+                    self.receipt_number = candidate
+                    break
         super().save(*args, **kwargs)
 
     def __str__(self):

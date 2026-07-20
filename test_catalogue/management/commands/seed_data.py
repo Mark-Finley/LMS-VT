@@ -231,15 +231,15 @@ class Command(BaseCommand):
         # Seed Phase 3 Demo Patient User Account
         self.stdout.write('Seeding Phase 3 patient user account...')
         from patients.models import Patient
-        demo_patient, _ = Patient.objects.get_or_create(
-            first_name='Alice',
-            last_name='Wonderland',
-            defaults={
-                'gender': 'F',
-                'date_of_birth': '1995-04-12',
-                'phone_number': '+1 555-0143'
-            }
-        )
+        demo_patient = Patient.objects.filter(first_name='Alice', last_name='Wonderland').first()
+        if not demo_patient:
+            demo_patient = Patient.objects.create(
+                first_name='Alice',
+                last_name='Wonderland',
+                gender='F',
+                date_of_birth='1995-04-12',
+                phone_number='+1555-0143'
+            )
         if not User.objects.filter(username='patient').exists():
             User.objects.create_user(
                 username='patient',
