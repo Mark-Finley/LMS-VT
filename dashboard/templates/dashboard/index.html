@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Excelsior Laboratory Portal</title>
+    <link rel="shortcut icon" href="#">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -157,21 +158,21 @@
         <div class="flex items-center space-x-4">
             <!-- Theme Switcher -->
             <div class="flex items-center space-x-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700/50 mr-2">
-                <button @click="setTheme('light')" 
+                <button type="button" @click="setTheme('light')" 
                         :class="themeMode === 'light' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-700/40'"
                         class="p-1.5 rounded-lg transition-all text-xs font-bold flex items-center justify-center" title="Light Mode">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
                     </svg>
                 </button>
-                <button @click="setTheme('dark')" 
+                <button type="button" @click="setTheme('dark')" 
                         :class="themeMode === 'dark' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-700/40'"
                         class="p-1.5 rounded-lg transition-all text-xs font-bold flex items-center justify-center" title="Dark Mode">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                     </svg>
                 </button>
-                <button @click="setTheme('system')" 
+                <button type="button" @click="setTheme('system')" 
                         :class="themeMode === 'system' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-700/40'"
                         class="p-1.5 rounded-lg transition-all text-xs font-bold flex items-center justify-center" title="System Theme">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -202,7 +203,7 @@
             <nav class="space-y-1">
                 <!-- Doctor Navigation -->
                 <template x-if="userRole === 'doctor'">
-                    <button @click="currentTab = 'doctor_dashboard'; fetchDoctorDashboard();" 
+                    <button type="button" @click="currentTab = 'doctor_dashboard'; fetchDoctorDashboard();" 
                             :class="currentTab === 'doctor_dashboard' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -214,7 +215,7 @@
 
                 <!-- Patient Navigation -->
                 <template x-if="userRole === 'patient'">
-                    <button @click="currentTab = 'patient_dashboard'; fetchPatientDashboard();" 
+                    <button type="button" @click="currentTab = 'patient_dashboard'; fetchPatientDashboard();" 
                             :class="currentTab === 'patient_dashboard' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -226,7 +227,7 @@
 
                 <!-- Standard Staff Navigation -->
                 <div x-show="userRole !== 'doctor' && userRole !== 'patient'" class="space-y-1">
-                    <button x-show="hasTabAccess('overview')" @click="currentTab = 'overview'" 
+                    <button type="button" x-show="hasTabAccess('overview')" @click="currentTab = 'overview'" 
                             :class="currentTab === 'overview' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -234,7 +235,7 @@
                         </svg>
                         <span>Overview Dashboard</span>
                     </button>
-                    <button x-show="hasTabAccess('reception')" @click="currentTab = 'reception'" 
+                    <button type="button" x-show="hasTabAccess('reception')" @click="currentTab = 'reception'" 
                             :class="currentTab === 'reception' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -242,7 +243,7 @@
                         </svg>
                         <span>Reception & Patients</span>
                     </button>
-                    <button x-show="hasTabAccess('booked_visits')" @click="currentTab = 'booked_visits'; fetchBookedVisits();" 
+                    <button type="button" x-show="hasTabAccess('booked_visits')" @click="currentTab = 'booked_visits'; fetchBookedVisits();" 
                             :class="currentTab === 'booked_visits' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -250,7 +251,7 @@
                         </svg>
                         <span>Booked Visits</span>
                     </button>
-                    <button x-show="hasTabAccess('billing')" @click="currentTab = 'billing'" 
+                    <button type="button" x-show="hasTabAccess('billing')" @click="currentTab = 'billing'" 
                             :class="currentTab === 'billing' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -258,7 +259,7 @@
                         </svg>
                         <span>Cashier & Billing</span>
                     </button>
-                    <button x-show="hasTabAccess('phlebotomy')" @click="currentTab = 'phlebotomy'" 
+                    <button type="button" x-show="hasTabAccess('phlebotomy')" @click="currentTab = 'phlebotomy'" 
                             :class="currentTab === 'phlebotomy' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -266,7 +267,7 @@
                         </svg>
                         <span>Phlebotomy (Samples)</span>
                     </button>
-                    <button x-show="hasTabAccess('testing')" @click="currentTab = 'testing'" 
+                    <button type="button" x-show="hasTabAccess('testing')" @click="currentTab = 'testing'" 
                             :class="currentTab === 'testing' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -274,7 +275,7 @@
                         </svg>
                         <span>Lab Testing (Results)</span>
                     </button>
-                    <button x-show="hasTabAccess('pathology')" @click="currentTab = 'pathology'" 
+                    <button type="button" x-show="hasTabAccess('pathology')" @click="currentTab = 'pathology'" 
                             :class="currentTab === 'pathology' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -282,7 +283,7 @@
                         </svg>
                         <span>Pathology Verification</span>
                     </button>
-                    <button x-show="hasTabAccess('inventory')" @click="currentTab = 'inventory'; fetchReagents();" 
+                    <button type="button" x-show="hasTabAccess('inventory')" @click="currentTab = 'inventory'; fetchReagents();" 
                             :class="currentTab === 'inventory' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -290,7 +291,7 @@
                         </svg>
                         <span>Inventory & Reagents</span>
                     </button>
-                    <button x-show="hasTabAccess('equipment')" @click="currentTab = 'equipment'; fetchEquipment();" 
+                    <button type="button" x-show="hasTabAccess('equipment')" @click="currentTab = 'equipment'; fetchEquipment();" 
                             :class="currentTab === 'equipment' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -299,7 +300,7 @@
                         </svg>
                         <span>Analyzers & Equipment</span>
                     </button>
-                    <button x-show="hasTabAccess('quality')" @click="currentTab = 'quality'; fetchQc(); fetchNC();" 
+                    <button type="button" x-show="hasTabAccess('quality')" @click="currentTab = 'quality'; fetchQc(); fetchNC();" 
                             :class="currentTab === 'quality' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -307,7 +308,7 @@
                         </svg>
                         <span>Quality Control (QC)</span>
                     </button>
-                    <button x-show="hasTabAccess('referrals')" @click="currentTab = 'referrals'; fetchReferrals();" 
+                    <button type="button" x-show="hasTabAccess('referrals')" @click="currentTab = 'referrals'; fetchReferrals();" 
                             :class="currentTab === 'referrals' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -315,7 +316,7 @@
                         </svg>
                         <span>Partner Referrals</span>
                     </button>
-                    <button x-show="hasTabAccess('catalogue')" @click="currentTab = 'catalogue'; fetchCatalogue();" 
+                    <button type="button" x-show="hasTabAccess('catalogue')" @click="currentTab = 'catalogue'; fetchCatalogue();" 
                             :class="currentTab === 'catalogue' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-sm text-left">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -532,7 +533,7 @@
                                             <td class="py-3 text-slate-300" x-text="p.date_of_birth"></td>
                                             <td class="py-3 text-slate-300" x-text="p.phone_number"></td>
                                             <td class="py-3 text-right">
-                                                <button @click="selectPatientForRequest(p)" class="px-3 py-1 bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white rounded-lg text-xs font-bold transition-all border border-indigo-500/20">
+                                                <button type="button" @click="selectPatientForRequest(p)" class="px-3 py-1 bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white rounded-lg text-xs font-bold transition-all border border-indigo-500/20">
                                                     Order Lab Test
                                                 </button>
                                             </td>
@@ -581,10 +582,10 @@
                         </div>
 
                         <div class="flex space-x-2 pt-2">
-                            <button @click="createTestOrder()" class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg transition-all text-sm">
+                            <button type="button" @click="createTestOrder()" class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg transition-all text-sm">
                                 Submit Lab Order
                             </button>
-                            <button @click="selectedPatient = null" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-sm">
+                            <button type="button" @click="selectedPatient = null" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-sm">
                                 Cancel
                             </button>
                         </div>
@@ -627,7 +628,7 @@
                                     </td>
                                     <td class="py-3.5 text-right">
                                         {% if inv.payment_status != 'paid' %}
-                                        <button @click="openPaymentModal({{ inv.id }}, '{{ inv.patient.full_name }}', {{ inv.balance_due }})" class="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-emerald-500/10">
+                                        <button type="button" @click="openPaymentModal({{ inv.id }}, '{{ inv.patient.full_name }}', {{ inv.balance_due }})" class="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-emerald-500/10">
                                             Record Payment
                                         </button>
                                         {% else %}
@@ -672,10 +673,10 @@
                                 <input type="text" x-model="paymentModal.reference" placeholder="e.g. TXN-12948" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white">
                             </div>
                             <div class="flex space-x-2 pt-2">
-                                <button @click="submitPayment()" class="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg transition-all text-sm">
+                                <button type="button" @click="submitPayment()" class="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg transition-all text-sm">
                                     Confirm Payment
                                 </button>
-                                <button @click="showPaymentModal = false" class="py-3 px-6 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-sm">
+                                <button type="button" @click="showPaymentModal = false" class="py-3 px-6 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-sm">
                                     Cancel
                                 </button>
                             </div>
@@ -718,7 +719,7 @@
                                     </td>
                                     <td class="py-3.5 text-right">
                                         {% if req.payment_status == 'paid' or req.payment_status == 'waived' %}
-                                        <button @click="openCollectionModal({{ req.id }}, '{{ req.request_number }}')" class="px-3 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
+                                        <button type="button" @click="openCollectionModal({{ req.id }}, '{{ req.request_number }}')" class="px-3 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
                                             Collect Specimens
                                         </button>
                                         {% else %}
@@ -757,10 +758,10 @@
                             </div>
                             <p class="text-[11px] text-slate-500">Note: Saving this step auto-generates a unique laboratory barcode number matching the sample tube.</p>
                             <div class="flex space-x-2 pt-2">
-                                <button @click="submitCollection()" class="flex-1 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg transition-all text-sm">
+                                <button type="button" @click="submitCollection()" class="flex-1 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg transition-all text-sm">
                                     Collect & Print Barcode
                                 </button>
-                                <button @click="showCollectionModal = false" class="py-3 px-6 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-sm">
+                                <button type="button" @click="showCollectionModal = false" class="py-3 px-6 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-sm">
                                     Cancel
                                 </button>
                             </div>
@@ -806,14 +807,14 @@
                                     </td>
                                     <td class="py-3.5 text-right space-x-2">
                                         {% if s.status == 'collected' %}
-                                        <button @click="receiveSample({{ s.id }})" class="px-2.5 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
+                                        <button type="button" @click="receiveSample({{ s.id }})" class="px-2.5 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
                                             Receive
                                         </button>
-                                        <button @click="rejectSample({{ s.id }})" class="px-2.5 py-1 bg-rose-500/20 hover:bg-rose-500 text-rose-400 hover:text-white rounded-lg text-xs font-bold transition-all border border-rose-500/30">
+                                        <button type="button" @click="rejectSample({{ s.id }})" class="px-2.5 py-1 bg-rose-500/20 hover:bg-rose-500 text-rose-400 hover:text-white rounded-lg text-xs font-bold transition-all border border-rose-500/30">
                                             Reject
                                         </button>
                                         {% elif s.status == 'received' or s.status == 'processing' or s.status == 'testing' %}
-                                        <button @click="openResultEntryModal({{ s.id }}, '{{ s.barcode_number }}', '{{ s.request.encounter.patient.full_name }}')" class="px-2.5 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
+                                        <button type="button" @click="openResultEntryModal({{ s.id }}, '{{ s.barcode_number }}', '{{ s.request.encounter.patient.full_name }}')" class="px-2.5 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
                                             Enter Results
                                         </button>
                                         {% else %}
@@ -889,10 +890,10 @@
                                 <textarea x-model="resultModal.interpretation" rows="2" placeholder="Reference notes..." class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white"></textarea>
                             </div>
                             <div class="flex space-x-2 pt-2">
-                                <button @click="submitResult()" class="flex-1 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg transition-all text-sm">
+                                <button type="button" @click="submitResult()" class="flex-1 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg transition-all text-sm">
                                     Save Draft Result
                                 </button>
-                                <button @click="showResultModal = false" class="py-3 px-6 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-sm">
+                                <button type="button" @click="showResultModal = false" class="py-3 px-6 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-sm">
                                     Cancel
                                 </button>
                             </div>
@@ -938,13 +939,13 @@
                                             </span>
                                         </td>
                                         <td class="py-3.5 text-right space-x-1">
-                                            <button x-show="r.status === 'draft'" @click="reviewResult(r.id)" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
+                                            <button type="button" x-show="r.status === 'draft'" @click="reviewResult(r.id)" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
                                                 Review
                                             </button>
-                                            <button x-show="r.status === 'draft' || r.status === 'reviewed'" @click="verifyResult(r.id)" class="px-2.5 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
+                                            <button type="button" x-show="r.status === 'draft' || r.status === 'reviewed'" @click="verifyResult(r.id)" class="px-2.5 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
                                                 Verify (Sign)
                                             </button>
-                                            <button x-show="r.status === 'verified'" @click="releaseResult(r.id)" class="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
+                                            <button type="button" x-show="r.status === 'verified'" @click="releaseResult(r.id)" class="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
                                                 Release PDF
                                             </button>
                                             <span x-show="r.status === 'released'" class="text-xs text-slate-500 font-semibold">Released</span>
@@ -994,7 +995,7 @@
                     <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-bold text-white">Consumables Stock Registry</h3>
-                            <button @click="openStockModal()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs">Record Stock Update</button>
+                            <button type="button" @click="openStockModal()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs">Record Stock Update</button>
                         </div>
                         <div class="overflow-x-auto max-h-96">
                             <table class="w-full text-sm text-left">
@@ -1102,7 +1103,7 @@
                     <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-bold text-white">Diagnostic Analyzers</h3>
-                            <button @click="openMaintenanceModal()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs">Record Maintenance</button>
+                            <button type="button" @click="openMaintenanceModal()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs">Record Maintenance</button>
                         </div>
                         <div class="overflow-x-auto max-h-96">
                             <table class="w-full text-sm text-left">
@@ -1228,7 +1229,7 @@
                         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="text-lg font-bold text-white">Quality Control Runs Log</h3>
-                                <button @click="openQcRunModal()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs">Run QC Calibration</button>
+                                <button type="button" @click="openQcRunModal()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs">Run QC Calibration</button>
                             </div>
                             <div class="overflow-x-auto max-h-60">
                                 <table class="w-full text-sm text-left">
@@ -1265,7 +1266,7 @@
                         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="text-lg font-bold text-white">Non-Conformance & Corrective Actions (CAPA)</h3>
-                                <button @click="openNCModal()" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-lg text-xs">Record Deviation</button>
+                                <button type="button" @click="openNCModal()" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-lg text-xs">Record Deviation</button>
                             </div>
                             <div class="overflow-x-auto max-h-60">
                                 <table class="w-full text-sm text-left">
@@ -1846,10 +1847,10 @@
                                             </span>
                                         </td>
                                         <td class="py-4 text-right space-x-2">
-                                            <button @click="recallOrder(v)" class="px-3 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
+                                            <button type="button" @click="recallOrder(v)" class="px-3 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
                                                 Recall & Edit
                                             </button>
-                                            <button @click="cancelEntireVisit(v.id)" class="px-3 py-1 bg-rose-500/20 hover:bg-rose-600 text-rose-400 hover:text-white rounded-lg text-xs font-bold transition-all border border-rose-500/30">
+                                            <button type="button" @click="cancelEntireVisit(v.id)" class="px-3 py-1 bg-rose-500/20 hover:bg-rose-600 text-rose-400 hover:text-white rounded-lg text-xs font-bold transition-all border border-rose-500/30">
                                                 Cancel Visit
                                             </button>
                                         </td>
@@ -1868,7 +1869,7 @@
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4">
                         <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                             <h3 class="text-lg font-bold text-white text-left">Recall & Edit Diagnostic Order</h3>
-                            <button @click="showRecallModal = false" class="text-slate-400 hover:text-white">
+                            <button type="button" @click="showRecallModal = false" class="text-slate-400 hover:text-white">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
@@ -1890,7 +1891,7 @@
                                             <span class="text-xs font-bold text-white" x-text="rt.test_detail.name"></span>
                                             <span class="block text-[10px] text-slate-400" x-text="'Price: GH₵' + rt.price_at_request + ' | Status: ' + rt.status"></span>
                                         </div>
-                                        <button @click="deleteOrderedTest(rt.id)" 
+                                        <button type="button" @click="deleteOrderedTest(rt.id)" 
                                                 :disabled="rt.status !== 'pending'"
                                                 class="px-2 py-1 bg-rose-500/20 hover:bg-rose-600 text-rose-400 hover:text-white rounded text-[10px] font-bold border border-rose-500/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
                                             Cancel Test
@@ -1910,7 +1911,7 @@
                                         <option :value="t.id" x-text="t.name + ' (GH₵' + t.price + ')'"></option>
                                     </template>
                                 </select>
-                                <button @click="addTestToOrder()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
+                                <button type="button" @click="addTestToOrder()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all shadow-md">
                                     Add Test
                                 </button>
                             </div>
@@ -2111,9 +2112,9 @@
                             this.fetchCatalogue();
                         } else if (this.currentTab === 'quality') {
                             this.fetchNC();
-                            this.fetchQC();
+                            this.fetchQc();
                         } else if (this.currentTab === 'inventory') {
-                            this.fetchInventory();
+                            this.fetchReagents();
                         } else if (this.currentTab === 'equipment') {
                             this.fetchEquipment();
                         }
@@ -2130,9 +2131,9 @@
                             this.fetchCatalogue();
                         } else if (val === 'quality') {
                             this.fetchNC();
-                            this.fetchQC();
+                            this.fetchQc();
                         } else if (val === 'inventory') {
-                            this.fetchInventory();
+                            this.fetchReagents();
                         } else if (val === 'equipment') {
                             this.fetchEquipment();
                         }
@@ -2160,7 +2161,7 @@
                     fetch(url)
                         .then(r => r.json())
                         .then(data => {
-                            this.patientList = data;
+                            this.patientList = Array.isArray(data) ? data : (data.results || []);
                         });
                 },
 
@@ -2199,8 +2200,6 @@
                         this.encounterForm = { encounter_type: 'walk_in', referring_physician: '' };
                         this.fetchPatients();
                         this.fetchMetrics();
-                        // Reload standard layout
-                        window.location.reload();
                     });
                 },
 
@@ -2235,8 +2234,8 @@
                         alert('Laboratory order submitted successfully!');
                         this.selectedPatient = null;
                         this.orderForm = { encounter: '', priority: 'routine', test_ids: [] };
+                        this.fetchPatients();
                         this.fetchMetrics();
-                        window.location.reload();
                     });
                 },
 
@@ -2277,7 +2276,7 @@
                         alert('Payment recorded successfully!');
                         this.showPaymentModal = false;
                         this.fetchMetrics();
-                        window.location.reload();
+                        this.fetchBookedVisits();
                     });
                 },
 
@@ -2323,7 +2322,7 @@
                         alert('Sample collected and barcode generated!');
                         this.showCollectionModal = false;
                         this.fetchMetrics();
-                        window.location.reload();
+                        this.fetchResults();
                     });
                 },
 
@@ -2338,7 +2337,8 @@
                     .then(r => r.json())
                     .then(() => {
                         alert('Sample marked as received in Laboratory.');
-                        window.location.reload();
+                        this.fetchMetrics();
+                        this.fetchResults();
                     });
                 },
 
@@ -2357,7 +2357,8 @@
                     .then(r => r.json())
                     .then(() => {
                         alert('Sample marked as rejected.');
-                        window.location.reload();
+                        this.fetchMetrics();
+                        this.fetchResults();
                     });
                 },
 
@@ -2427,7 +2428,6 @@
                         this.showResultModal = false;
                         this.fetchMetrics();
                         this.fetchResults();
-                        window.location.reload();
                     });
                 },
 
@@ -2435,7 +2435,7 @@
                     fetch('/api/results/')
                         .then(r => r.json())
                         .then(data => {
-                            this.resultsList = data;
+                            this.resultsList = Array.isArray(data) ? data : (data.results || []);
                         });
                 },
 
@@ -2489,7 +2489,6 @@
                         alert('Result successfully released!');
                         this.fetchResults();
                         this.fetchMetrics();
-                        window.location.reload();
                     });
                 },
 
@@ -2497,7 +2496,7 @@
                 fetchReagents() {
                     fetch('/api/reagents/')
                         .then(r => r.json())
-                        .then(data => { this.reagentsList = data; });
+                        .then(data => { this.reagentsList = Array.isArray(data) ? data : (data.results || []); });
                 },
                 registerReagent() {
                     fetch('/api/reagents/', {
@@ -2540,7 +2539,7 @@
                 fetchEquipment() {
                     fetch('/api/equipment/')
                         .then(r => r.json())
-                        .then(data => { this.equipmentList = data; });
+                        .then(data => { this.equipmentList = Array.isArray(data) ? data : (data.results || []); });
                 },
                 registerEquipment() {
                     fetch('/api/equipment/', {
@@ -2583,10 +2582,10 @@
                 fetchQc() {
                     fetch('/api/qc-controls/')
                         .then(r => r.json())
-                        .then(data => { this.qcControlsList = data; });
+                        .then(data => { this.qcControlsList = Array.isArray(data) ? data : (data.results || []); });
                     fetch('/api/qc-runs/')
                         .then(r => r.json())
-                        .then(data => { this.qcRunsList = data; });
+                        .then(data => { this.qcRunsList = Array.isArray(data) ? data : (data.results || []); });
                 },
                 registerQcControl() {
                     fetch('/api/qc-controls/', {
@@ -2627,7 +2626,7 @@
                 fetchNC() {
                     fetch('/api/non-conformances/')
                         .then(r => r.json())
-                        .then(data => { this.nonConformancesList = data; });
+                        .then(data => { this.nonConformancesList = Array.isArray(data) ? data : (data.results || []); });
                 },
                 openNCModal() {
                     this.showNCModal = true;
@@ -2654,13 +2653,13 @@
                 fetchReferrals() {
                     fetch('/api/referrals/')
                         .then(r => r.json())
-                        .then(data => { this.referralsList = data; });
+                        .then(data => { this.referralsList = Array.isArray(data) ? data : (data.results || []); });
                     fetch('/api/referral-partners/')
                         .then(r => r.json())
-                        .then(data => { this.partnerList = data; });
+                        .then(data => { this.partnerList = Array.isArray(data) ? data : (data.results || []); });
                     fetch('/api/requested-tests/')
                         .then(r => r.json())
-                        .then(data => { this.pendingTestsList = data; });
+                        .then(data => { this.pendingTestsList = Array.isArray(data) ? data : (data.results || []); });
                 },
                 registerReferralPartner() {
                     fetch('/api/referral-partners/', {
@@ -2703,13 +2702,13 @@
                 fetchDoctorDashboard() {
                     fetch('/api/doctor/requests/')
                         .then(r => r.json())
-                        .then(data => { this.doctorRequestsList = data; });
+                        .then(data => { this.doctorRequestsList = Array.isArray(data) ? data : (data.results || []); });
                     fetch('/api/patients/')
                         .then(r => r.json())
-                        .then(data => { this.patientList = data; });
+                        .then(data => { this.patientList = Array.isArray(data) ? data : (data.results || []); });
                     fetch('/api/tests/')
                         .then(r => r.json())
-                        .then(data => { this.testsList = data; });
+                        .then(data => { this.testsList = Array.isArray(data) ? data : (data.results || []); });
                 },
                 doctorCreateRequest() {
                     if (this.orderForm.test_ids.length === 0) {
@@ -2738,18 +2737,18 @@
                         .then(data => { this.patientProfile = data; });
                     fetch('/api/mobile/results/')
                         .then(r => r.json())
-                        .then(data => { this.patientResultsList = data; });
+                        .then(data => { this.patientResultsList = Array.isArray(data) ? data : (data.results || []); });
                     fetch('/api/mobile/invoices/')
                         .then(r => r.json())
-                        .then(data => { this.patientInvoicesList = data; });
+                        .then(data => { this.patientInvoicesList = Array.isArray(data) ? data : (data.results || []); });
                 },
                 fetchCatalogue() {
                     fetch('/api/tests/')
                         .then(r => r.json())
-                        .then(data => { this.catalogueTests = data; });
+                        .then(data => { this.catalogueTests = Array.isArray(data) ? data : (data.results || []); });
                     fetch('/api/test-categories/')
                         .then(r => r.json())
-                        .then(data => { this.testCategoriesList = data; });
+                        .then(data => { this.testCategoriesList = Array.isArray(data) ? data : (data.results || []); });
                 },
                 createCatalogueTest() {
                     fetch('/api/tests/', {
@@ -2800,8 +2799,9 @@
                     fetch('/api/test-requests/')
                         .then(r => r.json())
                         .then(data => {
-                            data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                            this.bookedVisitsList = data.filter(v => v.payment_status !== 'paid');
+                            let list = Array.isArray(data) ? data : (data.results || []);
+                            list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                            this.bookedVisitsList = list.filter(v => v.payment_status !== 'paid');
                             if (refreshModalId) {
                                 let updated = this.bookedVisitsList.find(v => v.id === refreshModalId);
                                 if (updated) {
@@ -2824,6 +2824,7 @@
                 },
                 deleteOrderedTest(rtId) {
                     if (!confirm('Are you sure you want to cancel/delete this test from the order?')) return;
+                    let visitId = this.selectedRecallVisit ? this.selectedRecallVisit.id : null;
                     fetch(`/api/requested-tests/${rtId}/`, {
                         method: 'DELETE',
                         headers: {
@@ -2833,7 +2834,8 @@
                     .then(response => {
                         if (response.ok) {
                             alert('Ordered test cancelled/removed successfully.');
-                            window.location.reload();
+                            this.fetchBookedVisits(visitId);
+                            this.fetchMetrics();
                         } else {
                             alert('Failed to remove ordered test.');
                         }
@@ -2844,8 +2846,9 @@
                         alert('Please select a test to add.');
                         return;
                     }
+                    let visitId = this.selectedRecallVisit ? this.selectedRecallVisit.id : null;
                     let data = {
-                        request: this.selectedRecallVisit.id,
+                        request: visitId,
                         test: this.newRecallTestId
                     };
                     fetch('/api/requested-tests/', {
@@ -2860,7 +2863,8 @@
                     .then(res => {
                         alert('Test added to order successfully.');
                         this.newRecallTestId = '';
-                        window.location.reload();
+                        this.fetchBookedVisits(visitId);
+                        this.fetchMetrics();
                     });
                 },
                 cancelEntireVisit(visitId) {
@@ -2877,7 +2881,8 @@
                             alert('Entire visit order cancelled successfully.');
                             this.showRecallModal = false;
                             this.selectedRecallVisit = null;
-                            window.location.reload();
+                            this.fetchBookedVisits();
+                            this.fetchMetrics();
                         } else {
                             alert('Failed to cancel the visit order.');
                         }

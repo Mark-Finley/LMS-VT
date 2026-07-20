@@ -1,7 +1,9 @@
 import datetime
 import random
 from decimal import Decimal
+# pyrefly: ignore [missing-import]
 from django.core.management.base import BaseCommand
+# pyrefly: ignore [missing-import]
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 

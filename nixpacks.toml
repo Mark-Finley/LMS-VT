@@ -1,0 +1,2 @@
+[start]
+cmd = "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn laboratory_management.wsgi:application"
