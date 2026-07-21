@@ -3,6 +3,7 @@ from common.models import BaseModel
 
 class QCControl(BaseModel):
     name = models.CharField(max_length=100)
+    category = models.CharField(max_length=100, default='General')
     lot_number = models.CharField(max_length=50, unique=True)
     expiry_date = models.DateField()
     target_value = models.CharField(max_length=50, help_text="e.g. 5.0, Normal, Negative")

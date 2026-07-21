@@ -200,23 +200,131 @@ class Command(BaseCommand):
         )
 
         # Seed Phase 2 Quality Control
-        self.stdout.write('Seeding Phase 2 QC parameters...')
+        self.stdout.write('Seeding Quality Control parameters from Excel...')
         from quality.models import QCControl, QCRun
-        qc_control, _ = QCControl.objects.get_or_create(
-            lot_number='LOT-CBC-N5',
-            defaults={
-                'name': 'Sysmex CBC Normal Control',
-                'expiry_date': '2027-01-01',
-                'target_value': '14.2',
-                'standard_deviation': 0.3000
-            }
-        )
-        QCRun.objects.get_or_create(
-            control=qc_control,
-            value='14.3',
-            status='pass',
-            notes='Daily morning calibration pass.'
-        )
+        import os
+        import datetime
+        from django.conf import settings
+        from decimal import Decimal
+        
+        admin_user = User.objects.filter(role=User.ROLE_ADMINISTRATOR).first()
+        qc_excel_path = os.path.join(settings.BASE_DIR, "Laboratory_Inventory_QC_Equipment.xlsx")
+        if not os.path.exists(qc_excel_path):
+            qc_excel_path = r"c:\Users\HP\Desktop\LMS\Laboratory_Inventory_QC_Equipment.xlsx"
+
+        if os.path.exists(qc_excel_path):
+            wb = openpyxl.load_workbook(qc_excel_path)
+            if 'Quality Control' in wb.sheetnames:
+                ws = wb['Quality Control']
+                current_category = 'General'
+                for row in range(4, ws.max_row + 1):
+                    col_b = ws.cell(row, 2).value
+                    if not col_b:
+                        col_a = ws.cell(row, 1).value
+                        if col_a:
+                            clean_cat = re.sub(r'^\d+\.\s*', '', str(col_a)).strip()
+                            if not clean_cat.lower().startswith("legend:") and len(clean_cat) <= 100:
+                                current_category = clean_cat
+                        continue
+                    col_b_str = str(col_b).strip()
+                    if col_b_str.lower().startswith("legend:"):
+                        continue
+                    
+                    col_a = ws.cell(row, 1).value
+                    col_c = ws.cell(row, 3).value
+                    col_d = ws.cell(row, 4).value
+                    col_e = ws.cell(row, 5).value
+                    col_f = ws.cell(row, 6).value
+                    col_g = ws.cell(row, 7).value
+
+                    control_name = col_b_str
+                    level = str(col_c).strip() if col_c else ''
+                    
+                    if level and level.upper() != 'N/A':
+                        name = f"{control_name} - {level}"
+                    else:
+                        name = control_name
+
+                    # Lot Number
+                    if col_d:
+                        lot_number = str(col_d).strip()
+                    else:
+                        control_words = [w for w in re.split(r'[^a-zA-Z0-9]', control_name) if w]
+                        control_code = "".join(w[0].upper() for w in control_words)[:5]
+                        level_words = [w for w in re.split(r'[^a-zA-Z0-9]', level) if w]
+                        level_code = "".join(w[0].upper() for w in level_words)[:5] if level_words else 'NA'
+                        lot_number = f"LOT-{control_code}-{level_code}-{row}"
+
+                    # Target Value
+                    if col_e is not None:
+                        target_value = str(col_e).strip()
+                    else:
+                        level_lower = level.lower()
+                        if 'negative' in level_lower:
+                            target_value = "Negative"
+                        elif 'positive' in level_lower:
+                            target_value = "Positive"
+                        elif 'level 1' in level_lower or 'low' in level_lower or 'normal' in level_lower:
+                            target_value = "5.0"
+                        elif 'level 2' in level_lower or 'elevated' in level_lower or 'abnormal' in level_lower:
+                            target_value = "15.0"
+                        elif 'level 3' in level_lower or 'high' in level_lower:
+                            target_value = "25.0"
+                        else:
+                            target_value = "Normal"
+
+                    # Standard Deviation
+                    if col_f is not None:
+                        sd_str = str(col_f).strip().replace('+/-', '').replace('%', '')
+                        try:
+                            standard_deviation = Decimal(sd_str)
+                        except Exception:
+                            standard_deviation = Decimal('0.0000')
+                    else:
+                        try:
+                            target_val_float = float(target_value)
+                            standard_deviation = Decimal(f"{target_val_float * 0.1:.4f}")
+                        except ValueError:
+                            standard_deviation = Decimal('0.0000')
+
+                    # Expiry Date
+                    if col_g is not None:
+                        if isinstance(col_g, (datetime.date, datetime.datetime)):
+                            expiry_date = col_g.date() if isinstance(col_g, datetime.datetime) else col_g
+                        else:
+                            try:
+                                expiry_date = datetime.datetime.strptime(str(col_g).strip(), "%Y-%m-%d").date()
+                            except ValueError:
+                                expiry_date = datetime.date(2027, 12, 31)
+                    else:
+                        expiry_date = datetime.date(2027, 7, 21)
+
+                    qc_control, _ = QCControl.objects.update_or_create(
+                        lot_number=lot_number,
+                        defaults={
+                            'name': name[:100],
+                            'category': current_category[:100],
+                            'expiry_date': expiry_date,
+                            'target_value': target_value,
+                            'standard_deviation': standard_deviation,
+                            'created_by': admin_user,
+                            'updated_by': admin_user,
+                        }
+                    )
+                    
+                    if not QCRun.objects.filter(control=qc_control).exists():
+                        QCRun.objects.create(
+                            control=qc_control,
+                            value=target_value,
+                            status='pass',
+                            notes='Initial calibration pass on load.',
+                            created_by=admin_user,
+                            updated_by=admin_user,
+                        )
+            else:
+                self.stdout.write(self.style.WARNING("Quality Control sheet not found in Excel."))
+        else:
+            self.stdout.write(self.style.WARNING("Laboratory_Inventory_QC_Equipment.xlsx not found, skipping Excel-based QC seeding."))
 
         # Seed Phase 2 Referrals Partner
         self.stdout.write('Seeding Phase 2 referral partners...')

@@ -294,11 +294,54 @@ class Command(BaseCommand):
 
         qc_controls = list(QCControl.objects.all())
         for qc in qc_controls:
+            # Check if target value is numeric
+            try:
+                # Remove any %, unit, or other characters if present
+                clean_target = qc.target_value.replace('%', '').strip()
+                target_num = float(clean_target)
+                is_numeric = True
+            except ValueError:
+                is_numeric = False
+
             for _ in range(3):
+                # 90% pass rate
+                status = random.choices(['pass', 'fail'], weights=[90, 10])[0]
+                if is_numeric:
+                    sd = float(qc.standard_deviation)
+                    if sd <= 0:
+                        sd = target_num * 0.1 if target_num > 0 else 0.1
+                    if status == 'pass':
+                        # within 2 standard deviations
+                        val = target_num + random.uniform(-2 * sd, 2 * sd)
+                    else:
+                        # outside 2 standard deviations
+                        val = target_num + random.choice([-1, 1]) * random.uniform(2.1 * sd, 4 * sd)
+                    value_str = f"{val:.2f}"
+                else:
+                    if status == 'pass':
+                        value_str = qc.target_value
+                    else:
+                        # invert the status if categorical
+                        tv_lower = qc.target_value.lower()
+                        if 'non-reactive' in tv_lower:
+                            value_str = 'Reactive'
+                        elif 'reactive' in tv_lower:
+                            value_str = 'Non-reactive'
+                        elif 'negative' in tv_lower:
+                            value_str = 'Positive'
+                        elif 'positive' in tv_lower:
+                            value_str = 'Negative'
+                        elif 'no growth' in tv_lower:
+                            value_str = 'Growth expected'
+                        elif 'growth expected' in tv_lower:
+                            value_str = 'No growth'
+                        else:
+                            value_str = 'Out of Range'
+
                 QCRun.objects.create(
                     control=qc,
-                    value=f"{random.uniform(1.0, 10.0):.2f}",
-                    status=random.choice(['pass', 'fail']),
+                    value=value_str,
+                    status=status,
                     notes="Daily automated quality control run.",
                     created_by=admin_user,
                     updated_by=admin_user

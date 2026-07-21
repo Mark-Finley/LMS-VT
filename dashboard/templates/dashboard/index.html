@@ -1192,110 +1192,127 @@
 
             <!-- 9. QUALITY CONTROL PANEL -->
             <section x-show="currentTab === 'quality' && hasTabAccess('quality')" class="space-y-6" x-cloak>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Register QC Control Lot -->
-                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 h-fit">
-                        <h3 class="text-lg font-bold text-white mb-4">Register QC Control Lot</h3>
-                        <form @submit.prevent="registerQcControl()" class="space-y-4">
-                            <div>
-                                <label class="block text-slate-300 text-xs font-bold mb-1">Control Name</label>
-                                <input type="text" x-model="qcControlForm.name" required placeholder="e.g. Hematology Normal Control" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
-                            </div>
-                            <div>
-                                <label class="block text-slate-300 text-xs font-bold mb-1">Lot Number</label>
-                                <input type="text" x-model="qcControlForm.lot_number" required placeholder="e.g. LOT-4920A" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-slate-300 text-xs font-bold mb-1">Target Value</label>
-                                    <input type="text" x-model="qcControlForm.target_value" required placeholder="e.g. 5.0" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- QC Controls Registry -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col h-[650px]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-white">QC Controls Registry</h3>
+                            <button type="button" @click="showQcControlModal = true" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-750 text-white font-bold rounded-lg text-xs transition-all flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Register New Control
+                            </button>
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" x-model="qcSearchQuery" placeholder="Search controls (name, lot, category)..." class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div class="overflow-y-auto flex-1 pr-1 space-y-4">
+                            <template x-for="cat in Object.keys(groupedQcControls)" :key="cat">
+                                <div class="bg-slate-800/20 rounded-2xl p-4 border border-slate-800/60">
+                                    <h4 class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-3 border-b border-slate-800 pb-1.5" x-text="cat"></h4>
+                                    <div class="space-y-3">
+                                        <template x-for="ctrl in groupedQcControls[cat]" :key="ctrl.id">
+                                            <div class="flex justify-between items-start text-xs p-2.5 hover:bg-slate-800/40 rounded-xl transition-all border border-transparent hover:border-slate-800">
+                                                <div class="space-y-1">
+                                                    <div class="font-semibold text-slate-100 text-sm" x-text="ctrl.name"></div>
+                                                    <div class="text-slate-400">
+                                                        Lot: <span class="font-bold text-slate-300" x-text="ctrl.lot_number"></span> 
+                                                        <span class="mx-1.5 text-slate-600">|</span> 
+                                                        Exp: <span class="text-slate-300" x-text="ctrl.expiry_date"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="text-right space-y-1">
+                                                    <div class="text-slate-300">Target: <span class="font-bold text-emerald-400" x-text="ctrl.target_value"></span></div>
+                                                    <div class="text-slate-400">SD: <span class="font-semibold text-slate-300" x-text="ctrl.standard_deviation"></span></div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-slate-300 text-xs font-bold mb-1">Acceptable SD</label>
-                                    <input type="number" step="0.0001" x-model="qcControlForm.standard_deviation" required placeholder="0.25" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
+                            </template>
+                            <template x-if="Object.keys(groupedQcControls).length === 0">
+                                <div class="text-center text-slate-500 py-8 text-sm">
+                                    No matching QC controls found.
                                 </div>
-                            </div>
-                            <div>
-                                <label class="block text-slate-300 text-xs font-bold mb-1">Expiry Date</label>
-                                <input type="date" x-model="qcControlForm.expiry_date" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
-                            </div>
-                            <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-750 text-white font-bold rounded-lg text-sm">Register Control</button>
-                        </form>
+                            </template>
+                        </div>
                     </div>
 
-                    <!-- QC Runs Logs & Non-Conformances -->
-                    <div class="lg:col-span-2 space-y-6">
-                        <!-- QC Runs -->
-                        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-bold text-white">Quality Control Runs Log</h3>
-                                <button type="button" @click="openQcRunModal()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs">Run QC Calibration</button>
-                            </div>
-                            <div class="overflow-x-auto max-h-60">
-                                <table class="w-full text-sm text-left">
-                                    <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
-                                        <tr>
-                                            <th class="py-3">Control (Lot)</th>
-                                            <th class="py-3">Run Date</th>
-                                            <th class="py-3">Value</th>
-                                            <th class="py-3 text-right">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <template x-for="run in qcRunsList" :key="run.id">
-                                            <tr class="border-b border-slate-800/50 hover:bg-slate-800/20">
-                                                <td class="py-3.5 font-semibold text-white">
-                                                    <span x-text="run.control_name"></span>
-                                                </td>
-                                                <td class="py-3.5 text-slate-400 text-xs" x-text="run.run_date"></td>
-                                                <td class="py-3.5 text-slate-200" x-text="run.value"></td>
-                                                <td class="py-3.5 text-right">
-                                                    <span class="px-2 py-0.5 rounded text-xs font-bold uppercase border"
-                                                        :class="run.status === 'pass' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'"
-                                                        x-text="run.status">
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        </template>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <!-- Quality Control Runs Log -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col h-[650px]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-white">Quality Control Runs Log</h3>
+                            <button type="button" @click="openQcRunModal()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs transition-all flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                                Run QC Calibration
+                            </button>
                         </div>
+                        <div class="overflow-y-auto flex-1 pr-1">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
+                                    <tr>
+                                        <th class="py-3">Control (Lot)</th>
+                                        <th class="py-3">Run Date</th>
+                                        <th class="py-3">Value</th>
+                                        <th class="py-3 text-right">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="run in qcRunsList" :key="run.id">
+                                        <tr class="border-b border-slate-800/50 hover:bg-slate-800/20 transition-all">
+                                            <td class="py-3.5 font-semibold text-white">
+                                                <span x-text="run.control_name"></span>
+                                            </td>
+                                            <td class="py-3.5 text-slate-400 text-xs" x-text="run.run_date"></td>
+                                            <td class="py-3.5 text-slate-200" x-text="run.value"></td>
+                                            <td class="py-3.5 text-right">
+                                                <span class="px-2 py-0.5 rounded text-xs font-bold uppercase border"
+                                                    :class="run.status === 'pass' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'"
+                                                    x-text="run.status">
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-                        <!-- Non Conformances / Rejection CAPA log -->
-                        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-bold text-white">Non-Conformance & Corrective Actions (CAPA)</h3>
-                                <button type="button" @click="openNCModal()" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-lg text-xs">Record Deviation</button>
-                            </div>
-                            <div class="overflow-x-auto max-h-60">
-                                <table class="w-full text-sm text-left">
-                                    <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
-                                        <tr>
-                                            <th class="py-3">Deviation Title</th>
-                                            <th class="py-3">Description</th>
-                                            <th class="py-3">CAPA Resolution</th>
-                                            <th class="py-3 text-right">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <template x-for="nc in nonConformancesList" :key="nc.id">
-                                            <tr class="border-b border-slate-800/50 hover:bg-slate-800/20">
-                                                <td class="py-3 font-semibold text-white" x-text="nc.title"></td>
-                                                <td class="py-3 text-slate-300 text-xs" x-text="nc.description"></td>
-                                                <td class="py-3 text-slate-400 text-xs" x-text="nc.corrective_action || 'Pending action'"></td>
-                                                <td class="py-3 text-right">
-                                                    <span class="px-2 py-0.5 rounded text-xs font-bold uppercase border"
-                                                        :class="nc.status === 'closed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'"
-                                                        x-text="nc.status">
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        </template>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                <!-- Non Conformances / Rejection CAPA log -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-white">Non-Conformance & Corrective Actions (CAPA)</h3>
+                        <button type="button" @click="openNCModal()" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-lg text-xs transition-all flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            Record Deviation
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto max-h-60">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
+                                <tr>
+                                    <th class="py-3">Deviation Title</th>
+                                    <th class="py-3">Description</th>
+                                    <th class="py-3">CAPA Resolution</th>
+                                    <th class="py-3 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="nc in nonConformancesList" :key="nc.id">
+                                    <tr class="border-b border-slate-800/50 hover:bg-slate-800/20 transition-all">
+                                        <td class="py-3 font-semibold text-white" x-text="nc.title"></td>
+                                        <td class="py-3 text-slate-300 text-xs" x-text="nc.description"></td>
+                                        <td class="py-3 text-slate-400 text-xs" x-text="nc.corrective_action || 'Pending action'"></td>
+                                        <td class="py-3 text-right">
+                                            <span class="px-2 py-0.5 rounded text-xs font-bold uppercase border"
+                                                :class="nc.status === 'closed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'"
+                                                x-text="nc.status">
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -1367,6 +1384,45 @@
                             <div class="flex space-x-2 pt-2">
                                 <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg text-sm transition-all">Submit Deviation</button>
                                 <button type="button" @click="showNCModal = false" class="py-3 px-6 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-sm transition-all">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Register QC Control Modal -->
+                <div x-show="showQcControlModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" x-cloak>
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl">
+                        <h3 class="text-lg font-bold text-white mb-4">Register QC Control Lot</h3>
+                        <form @submit.prevent="registerQcControl()" class="space-y-4">
+                            <div>
+                                <label class="block text-slate-300 text-xs font-bold mb-1">Control Name</label>
+                                <input type="text" x-model="qcControlForm.name" required placeholder="e.g. Hematology Normal Control" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 text-xs font-bold mb-1">Category</label>
+                                <input type="text" x-model="qcControlForm.category" required placeholder="e.g. Haematology & Coagulation" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 text-xs font-bold mb-1">Lot Number</label>
+                                <input type="text" x-model="qcControlForm.lot_number" required placeholder="e.g. LOT-4920A" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-slate-300 text-xs font-bold mb-1">Target Value</label>
+                                    <input type="text" x-model="qcControlForm.target_value" required placeholder="e.g. 5.0" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 text-xs font-bold mb-1">Acceptable SD</label>
+                                    <input type="number" step="0.0001" x-model="qcControlForm.standard_deviation" required placeholder="0.25" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-slate-300 text-xs font-bold mb-1">Expiry Date</label>
+                                <input type="date" x-model="qcControlForm.expiry_date" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
+                            </div>
+                            <div class="flex space-x-2 pt-2">
+                                <button type="submit" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-750 text-white font-bold rounded-xl shadow-lg text-sm transition-all">Register Control</button>
+                                <button type="button" @click="showQcControlModal = false" class="py-3 px-6 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-sm transition-all">Cancel</button>
                             </div>
                         </form>
                     </div>
@@ -2005,9 +2061,33 @@
                 nonConformancesList: [],
                 showQcRunModal: false,
                 showNCModal: false,
-                qcControlForm: { name: '', lot_number: '', target_value: '5.0', standard_deviation: 0.05, expiry_date: '' },
+                showQcControlModal: false,
+                qcSearchQuery: '',
+                qcControlForm: { name: '', category: 'General', lot_number: '', target_value: '5.0', standard_deviation: 0.05, expiry_date: '' },
                 qcRunForm: { control: '', value: '5.0', status: 'pass', notes: '' },
                 ncForm: { title: '', description: '', date_identified: '', corrective_action: '', status: 'open' },
+                get filteredQcControls() {
+                    let query = this.qcSearchQuery.toLowerCase().trim();
+                    return this.qcControlsList.filter(ctrl => {
+                        return (
+                            ctrl.name.toLowerCase().includes(query) ||
+                            ctrl.lot_number.toLowerCase().includes(query) ||
+                            (ctrl.category && ctrl.category.toLowerCase().includes(query))
+                        );
+                    });
+                },
+                get groupedQcControls() {
+                    let filtered = this.filteredQcControls;
+                    let groups = {};
+                    filtered.forEach(ctrl => {
+                        let cat = ctrl.category || 'General';
+                        if (!groups[cat]) {
+                            groups[cat] = [];
+                        }
+                        groups[cat].push(ctrl);
+                    });
+                    return groups;
+                },
 
                 // Phase 2 Referral Variables
                 referralsList: [],
@@ -2599,7 +2679,8 @@
                     .then(r => r.json())
                     .then(() => {
                         alert('QC Control lot registered!');
-                        this.qcControlForm = { name: '', lot_number: '', target_value: '5.0', standard_deviation: 0.05, expiry_date: '' };
+                        this.qcControlForm = { name: '', category: 'General', lot_number: '', target_value: '5.0', standard_deviation: 0.05, expiry_date: '' };
+                        this.showQcControlModal = false;
                         this.fetchQc();
                     });
                 },
