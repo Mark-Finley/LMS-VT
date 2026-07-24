@@ -4,10 +4,41 @@ from django.http import HttpResponse
 from .models import TestRequest, RequestedTest
 from .serializers import TestRequestSerializer, RequestedTestSerializer
 
+from django.db.models import Q
+from common.pagination import StandardResultsSetPagination
+
 class TestRequestViewSet(viewsets.ModelViewSet):
     queryset = TestRequest.objects.all()
     serializer_class = TestRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.query_params.get('search')
+        if search:
+            words = search.split()
+            q_obj = Q()
+            for word in words:
+                q_obj &= (
+                    Q(encounter__patient__first_name__icontains=word) |
+                    Q(encounter__patient__last_name__icontains=word) |
+                    Q(encounter__patient__phone_number__icontains=word) |
+                    Q(request_number__icontains=word)
+                )
+            queryset = queryset.filter(q_obj)
+        
+        # Check if we are filtering for phlebotomy (payment_status == 'paid' or 'waived')
+        phlebotomy_only = self.request.query_params.get('phlebotomy_only')
+        if phlebotomy_only == 'true':
+            queryset = queryset.filter(payment_status__in=['paid', 'waived'])
+
+        # Check if we are filtering for booked visits (exclude fully paid)
+        unpaid_only = self.request.query_params.get('unpaid_only')
+        if unpaid_only == 'true':
+            queryset = queryset.exclude(payment_status='paid')
+
+        return queryset.order_by('-request_date')
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user, updated_by=self.request.user)

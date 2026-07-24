@@ -9,10 +9,31 @@ from .models import Sample, SampleTrackingLog
 from .serializers import SampleSerializer, SampleTrackingLogSerializer
 from requests.models import RequestedTest
 
+from django.db.models import Q
+from common.pagination import StandardResultsSetPagination
+
 class SampleViewSet(viewsets.ModelViewSet):
     queryset = Sample.objects.all()
     serializer_class = SampleSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.query_params.get('search')
+        if search:
+            words = search.split()
+            q_obj = Q()
+            for word in words:
+                q_obj &= (
+                    Q(request__encounter__patient__first_name__icontains=word) |
+                    Q(request__encounter__patient__last_name__icontains=word) |
+                    Q(request__encounter__patient__phone_number__icontains=word) |
+                    Q(barcode_number__icontains=word) |
+                    Q(sample_type__icontains=word)
+                )
+            queryset = queryset.filter(q_obj)
+        return queryset.order_by('-created_at')
 
     def perform_create(self, serializer):
         sample = serializer.save(

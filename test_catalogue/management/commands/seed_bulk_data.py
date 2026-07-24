@@ -5,6 +5,7 @@ from decimal import Decimal
 from django.core.management.base import BaseCommand
 # pyrefly: ignore [missing-import]
 from django.contrib.auth import get_user_model
+# pyrefly: ignore [missing-import]
 from django.utils import timezone
 
 from patients.models import Patient
@@ -48,15 +49,21 @@ class Command(BaseCommand):
             default=150,
             help='Number of patients to generate (defaults to 150, generating ~1500 total records across tables).'
         )
+        parser.add_argument(
+            '--force',
+            action='store_true',
+            help='Force bulk seeding even if database already contains data.'
+        )
 
     def handle(self, *args, **options):
         num_patients = options['count']
+        force = options['force']
 
         # Ensure seed_data has run first
         from django.core.management import call_command
         call_command('seed_data')
 
-        if Patient.objects.count() >= 20:
+        if Patient.objects.count() >= 20 and not force:
             self.stdout.write(self.style.SUCCESS("Database already contains seeded patients and laboratory records. Skipping bulk seed."))
             return
 

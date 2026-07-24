@@ -6,10 +6,31 @@ from .models import Result
 from .serializers import ResultSerializer
 from requests.models import RequestedTest
 
+from django.db.models import Q
+from common.pagination import StandardResultsSetPagination
+
 class ResultViewSet(viewsets.ModelViewSet):
     queryset = Result.objects.all()
     serializer_class = ResultSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.query_params.get('search')
+        if search:
+            words = search.split()
+            q_obj = Q()
+            for word in words:
+                q_obj &= (
+                    Q(requested_test__request__encounter__patient__first_name__icontains=word) |
+                    Q(requested_test__request__encounter__patient__last_name__icontains=word) |
+                    Q(requested_test__request__encounter__patient__phone_number__icontains=word) |
+                    Q(requested_test__test__name__icontains=word) |
+                    Q(value__icontains=word)
+                )
+            queryset = queryset.filter(q_obj)
+        return queryset.order_by('-created_at')
 
     def perform_create(self, serializer):
         # Parse numeric value if possible
