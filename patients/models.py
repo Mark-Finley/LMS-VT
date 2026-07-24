@@ -11,6 +11,7 @@ class Patient(BaseModel):
         (GENDER_OTHER, 'Other'),
     ]
 
+    patient_id = models.CharField(max_length=20, unique=True, blank=True, null=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     middle_name = models.CharField(max_length=50, blank=True, null=True)
@@ -38,3 +39,23 @@ class Patient(BaseModel):
 
     def __str__(self):
         return f"{self.full_name} ({self.date_of_birth})"
+
+    def save(self, *args, **kwargs):
+        if not self.patient_id:
+            last_patient = Patient.objects.filter(patient_id__startswith='Lab-P').order_by('-patient_id').first()
+            if last_patient and last_patient.patient_id:
+                try:
+                    last_num = int(last_patient.patient_id.split('Lab-P')[-1])
+                    next_num = last_num + 1
+                except ValueError:
+                    next_num = Patient.objects.count() + 1
+            else:
+                next_num = 1
+            
+            while True:
+                candidate = f"Lab-P{next_num:06d}"
+                if not Patient.objects.filter(patient_id=candidate).exists():
+                    self.patient_id = candidate
+                    break
+                next_num += 1
+        super().save(*args, **kwargs)

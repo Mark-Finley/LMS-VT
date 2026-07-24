@@ -396,6 +396,7 @@
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
                                     <tr>
+                                        <th class="py-3">Patient ID</th>
                                         <th class="py-3">Name</th>
                                         <th class="py-3">Gender</th>
                                         <th class="py-3">DOB</th>
@@ -405,6 +406,7 @@
                                 <tbody>
                                     {% for patient in patients %}
                                     <tr class="border-b border-slate-800/50 hover:bg-slate-800/20">
+                                        <td class="py-3.5 font-mono font-bold text-indigo-400">{{ patient.patient_id|default:"-" }}</td>
                                         <td class="py-3.5 font-semibold text-white">{{ patient.full_name }}</td>
                                         <td class="py-3.5 text-slate-300">{{ patient.get_gender_display }}</td>
                                         <td class="py-3.5 text-slate-300">{{ patient.date_of_birth|date:"Y-m-d" }}</td>
@@ -412,7 +414,7 @@
                                     </tr>
                                     {% empty %}
                                     <tr>
-                                        <td colspan="4" class="py-6 text-center text-slate-500">No patients registered.</td>
+                                        <td colspan="5" class="py-6 text-center text-slate-500">No patients registered.</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -530,12 +532,13 @@
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
                         <h2 class="text-lg font-bold text-white mb-4">Patient Directory</h2>
                         <div class="flex items-center space-x-2 mb-4">
-                            <input type="text" x-model="patientSearchQuery" @input.debounce="patientPage = 1; fetchPatients()" placeholder="Search patient by name or phone..." class="flex-1 px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none">
+                            <input type="text" x-model="patientSearchQuery" @input.debounce="patientPage = 1; fetchPatients()" placeholder="Search patient by ID, name or phone..." class="flex-1 px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none">
                         </div>
                         <div class="overflow-x-auto max-h-96 mb-4">
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
                                     <tr>
+                                        <th class="py-3">Patient ID</th>
                                         <th class="py-3">Name</th>
                                         <th class="py-3">DOB</th>
                                         <th class="py-3">Phone</th>
@@ -545,6 +548,7 @@
                                 <tbody>
                                     <template x-for="p in patientList" :key="p.id">
                                         <tr class="border-b border-slate-800/50 hover:bg-slate-800/20">
+                                            <td class="py-3 font-mono font-bold text-indigo-400" x-text="p.patient_id || '-'"></td>
                                             <td class="py-3 font-semibold text-white" x-text="p.full_name"></td>
                                             <td class="py-3 text-slate-300" x-text="p.date_of_birth"></td>
                                             <td class="py-3 text-slate-300" x-text="p.phone_number"></td>

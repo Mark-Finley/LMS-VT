@@ -21,7 +21,8 @@ class PatientViewSet(viewsets.ModelViewSet):
                 q_obj &= (
                     Q(first_name__icontains=word) |
                     Q(last_name__icontains=word) |
-                    Q(phone_number__icontains=word)
+                    Q(phone_number__icontains=word) |
+                    Q(patient_id__icontains=word)
                 )
             queryset = queryset.filter(q_obj)
         return queryset
