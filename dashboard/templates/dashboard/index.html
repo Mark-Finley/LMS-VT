@@ -3016,6 +3016,11 @@
                     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
                         this.systemPrefersDark = e.matches;
                     });
+
+                    // Auto-refresh active tab every 30 seconds
+                    setInterval(() => {
+                        this.refreshActiveTab();
+                    }, 30000);
                 },
 
                 fetchMetrics() {
@@ -3024,6 +3029,48 @@
                         .then(data => {
                             this.metrics = data;
                         });
+                },
+
+                refreshActiveTab() {
+                    let val = this.currentTab;
+                    if (this.userRole === 'doctor') {
+                        this.fetchDoctorDashboard();
+                    } else if (this.userRole === 'patient') {
+                        this.fetchPatientDashboard();
+                    } else {
+                        // Refresh dashboard metrics
+                        this.fetchMetrics();
+                        
+                        if (val === 'overview') {
+                            this.fetchPatients();
+                            this.fetchResults();
+                        } else if (val === 'reception') {
+                            this.fetchPatients();
+                        } else if (val === 'booked_visits') {
+                            this.fetchBookedVisits();
+                        } else if (val === 'referrals') {
+                            this.fetchReferrals();
+                        } else if (val === 'catalogue') {
+                            this.fetchCatalogue();
+                        } else if (val === 'quality') {
+                            this.fetchNC();
+                            this.fetchQc();
+                        } else if (val === 'inventory') {
+                            this.fetchReagents();
+                        } else if (val === 'equipment') {
+                            this.fetchEquipment();
+                        } else if (val === 'billing') {
+                            this.fetchInvoices();
+                        } else if (val === 'phlebotomy') {
+                            this.fetchPhlebotomy();
+                        } else if (val === 'testing') {
+                            this.fetchSamples();
+                        } else if (val === 'pathology') {
+                            this.fetchResults();
+                        } else if (val === 'user_management') {
+                            this.fetchUsers();
+                        }
+                    }
                 },
 
                 fetchUsers() {
