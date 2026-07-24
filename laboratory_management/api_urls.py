@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from accounts.views import obtain_jwt_token
+from accounts.views import obtain_jwt_token, UserViewSet
 from patients.views import PatientViewSet
 from encounters.views import EncounterViewSet
 from test_catalogue.views import TestCategoryViewSet, TestViewSet, TestParameterViewSet
@@ -10,6 +10,7 @@ from results.views import ResultViewSet
 from billing.views import InvoiceViewSet, PaymentViewSet, ReceiptViewSet
 
 router = DefaultRouter()
+router.register(r'users', UserViewSet, basename='users')
 router.register(r'patients', PatientViewSet, basename='patients')
 router.register(r'encounters', EncounterViewSet, basename='encounters')
 router.register(r'test-categories', TestCategoryViewSet, basename='test-categories')
