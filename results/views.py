@@ -26,6 +26,7 @@ class ResultViewSet(viewsets.ModelViewSet):
                     Q(requested_test__request__encounter__patient__first_name__icontains=word) |
                     Q(requested_test__request__encounter__patient__last_name__icontains=word) |
                     Q(requested_test__request__encounter__patient__phone_number__icontains=word) |
+                    Q(requested_test__request__encounter__patient__patient_id__icontains=word) |
                     Q(requested_test__test__name__icontains=word) |
                     Q(value__icontains=word)
                 )

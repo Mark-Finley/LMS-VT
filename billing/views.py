@@ -24,6 +24,7 @@ class InvoiceViewSet(viewsets.ModelViewSet):
                     Q(patient__first_name__icontains=word) |
                     Q(patient__last_name__icontains=word) |
                     Q(patient__phone_number__icontains=word) |
+                    Q(patient__patient_id__icontains=word) |
                     Q(id__icontains=word)
                 )
             queryset = queryset.filter(q_obj)

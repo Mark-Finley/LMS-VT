@@ -24,6 +24,7 @@ class TestRequestViewSet(viewsets.ModelViewSet):
                     Q(encounter__patient__first_name__icontains=word) |
                     Q(encounter__patient__last_name__icontains=word) |
                     Q(encounter__patient__phone_number__icontains=word) |
+                    Q(encounter__patient__patient_id__icontains=word) |
                     Q(request_number__icontains=word)
                 )
             queryset = queryset.filter(q_obj)

@@ -29,6 +29,7 @@ class SampleViewSet(viewsets.ModelViewSet):
                     Q(request__encounter__patient__first_name__icontains=word) |
                     Q(request__encounter__patient__last_name__icontains=word) |
                     Q(request__encounter__patient__phone_number__icontains=word) |
+                    Q(request__encounter__patient__patient_id__icontains=word) |
                     Q(barcode_number__icontains=word) |
                     Q(sample_type__icontains=word)
                 )
