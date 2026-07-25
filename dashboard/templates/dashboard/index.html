@@ -701,7 +701,12 @@
                                     <tr class="border-b border-slate-800/50 hover:bg-slate-800/20">
                                         <td class="py-3.5 font-bold text-white" x-text="'#' + inv.id"></td>
                                         <td class="py-3.5 text-slate-200 font-semibold" x-text="inv.patient_detail ? inv.patient_detail.full_name : 'Unknown'"></td>
-                                        <td class="py-3.5 text-white font-bold" x-text="'GH₵' + inv.payable_amount"></td>
+                                        <td class="py-3.5">
+                                            <div class="font-bold text-white" x-text="'GH₵' + inv.payable_amount"></div>
+                                            <template x-if="parseFloat(inv.referral_discount) > 0">
+                                                <div class="text-[10px] text-emerald-400 font-semibold" x-text="'-GH₵' + parseFloat(inv.referral_discount).toFixed(2) + ' Ref Disc'"></div>
+                                            </template>
+                                        </td>
                                         <td class="py-3.5 text-emerald-400" x-text="'GH₵' + inv.paid_amount"></td>
                                         <td class="py-3.5 text-rose-400 font-bold" x-text="'GH₵' + inv.balance_due"></td>
                                         <td class="py-3.5">
@@ -1729,6 +1734,16 @@
                                 <label class="block text-slate-300 text-xs font-bold mb-1">Partner Email</label>
                                 <input type="email" x-model="partnerForm.email" placeholder="partner@hospital.com" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
                             </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-slate-300 text-xs font-bold mb-1">Discount Rate (%)</label>
+                                    <input type="number" step="0.01" min="0" max="100" x-model="partnerForm.discount_percentage" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 text-xs font-bold mb-1">Commission Rate (%)</label>
+                                    <input type="number" step="0.01" min="0" max="100" x-model="partnerForm.commission_rate" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
+                                </div>
+                            </div>
                             <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-750 text-white font-bold rounded-lg text-sm">Register Partner</button>
                         </form>
                     </div>
@@ -1744,26 +1759,46 @@
                                 <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
                                     <tr>
                                         <th class="py-3">Investigation</th>
-                                        <th class="py-3">Partner Location</th>
-                                        <th class="py-3">Referral Type</th>
-                                        <th class="py-3">Dispatch Date</th>
+                                        <th class="py-3">Partner</th>
+                                        <th class="py-3">Type</th>
+                                        <th class="py-3">Date</th>
+                                        <th class="py-3">Fee/Disc</th>
+                                        <th class="py-3">Commission</th>
+                                        <th class="py-3">Payment</th>
                                         <th class="py-3 text-right">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <template x-for="ref in referralsList" :key="ref.id">
-                                        <tr class="border-b border-slate-800/50 hover:bg-slate-800/20">
-                                            <td class="py-3.5 font-bold text-white" x-text="ref.requested_test_detail.test_detail.name"></td>
-                                            <td class="py-3.5 text-slate-200 font-semibold" x-text="ref.partner_name"></td>
-                                            <td class="py-3.5">
-                                                <span class="px-2 py-0.5 rounded text-xs font-bold uppercase border"
+                                        <tr class="border-b border-slate-800/50 hover:bg-slate-800/20 text-xs">
+                                            <td class="py-3 font-bold text-white" x-text="ref.requested_test_detail ? ref.requested_test_detail.test_detail.name : 'Unknown'"></td>
+                                            <td class="py-3 text-slate-200 font-semibold" x-text="ref.partner_name"></td>
+                                            <td class="py-3">
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border"
                                                     :class="ref.referral_type === 'outgoing' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'"
                                                     x-text="ref.referral_type">
                                                 </span>
                                             </td>
-                                            <td class="py-3.5 text-slate-400 text-xs" x-text="ref.referral_date"></td>
-                                            <td class="py-3.5 text-right">
-                                                <span class="px-2 py-0.5 rounded text-xs font-bold uppercase border"
+                                            <td class="py-3 text-slate-400" x-text="new Date(ref.referral_date).toLocaleDateString()"></td>
+                                            <td class="py-3 font-bold text-white" x-text="'GH₵' + parseFloat(ref.amount || 0).toFixed(2)"></td>
+                                            <td class="py-3 text-indigo-400 font-bold" x-text="ref.referral_type === 'incoming' ? 'GH₵' + parseFloat(ref.commission_amount || 0).toFixed(2) : '-'"></td>
+                                            <td class="py-3">
+                                                <div class="flex items-center space-x-1">
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border"
+                                                        :class="ref.payment_status === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
+                                                                ref.payment_status === 'unpaid' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' : 
+                                                                'bg-slate-500/10 text-slate-400 border-slate-500/20'"
+                                                        x-text="ref.payment_status">
+                                                    </span>
+                                                    <template x-if="ref.referral_type === 'outgoing' && ref.payment_status === 'unpaid'">
+                                                        <button type="button" @click="settleReferralPayment(ref.id)" class="text-indigo-400 hover:text-indigo-300 font-bold underline text-[10px]">
+                                                            Pay
+                                                        </button>
+                                                    </template>
+                                                </div>
+                                            </td>
+                                            <td class="py-3 text-right">
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border"
                                                     :class="ref.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
                                                             ref.status === 'sent' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 
                                                             'bg-amber-500/10 text-amber-400 border-amber-500/20'"
@@ -1778,6 +1813,44 @@
                     </div>
                 </div>
 
+                <!-- Registered Partners & Ledgers (Option B) -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4">Partner Accounts & Ledgers (Option B)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
+                                <tr>
+                                    <th class="py-3">Partner Name</th>
+                                    <th class="py-3">Contact</th>
+                                    <th class="py-3">Email</th>
+                                    <th class="py-3">Patient Discount</th>
+                                    <th class="py-3">Referral Commission</th>
+                                    <th class="py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="p in partnerList" :key="p.id">
+                                    <tr class="border-b border-slate-800/50 hover:bg-slate-800/20">
+                                        <td class="py-3 font-bold text-white" x-text="p.name"></td>
+                                        <td class="py-3 text-slate-200" x-text="p.contact_number || 'N/A'"></td>
+                                        <td class="py-3 text-slate-400" x-text="p.email || 'N/A'"></td>
+                                        <td class="py-3 text-emerald-400 font-semibold" x-text="parseFloat(p.discount_percentage || 0).toFixed(2) + '%'"></td>
+                                        <td class="py-3 text-indigo-400 font-semibold" x-text="parseFloat(p.commission_rate || 0).toFixed(2) + '%'"></td>
+                                        <td class="py-3 text-right">
+                                            <button type="button" @click="openLedgerModal(p.id)" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-all shadow-md">
+                                                View Ledger / Report
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                                <tr x-show="partnerList.length === 0">
+                                    <td colspan="6" class="py-6 text-center text-slate-500">No referral partners registered.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Create Referral Case Modal -->
                 <div x-show="showReferralModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" x-cloak>
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl">
@@ -1788,7 +1861,7 @@
                                 <select x-model="referralForm.partner" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
                                     <option value="">-- Choose Partner --</option>
                                     <template x-for="p in partnerList" :key="p.id">
-                                        <option :value="p.id" x-text="p.name"></option>
+                                        <option :value="p.id" x-text="p.name + ' (' + parseFloat(p.discount_percentage || 0) + '% disc / ' + parseFloat(p.commission_rate || 0) + '% comm)'"></option>
                                     </template>
                                 </select>
                             </div>
@@ -1808,6 +1881,22 @@
                                     </template>
                                 </select>
                             </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-slate-300 text-xs font-bold mb-1">Fee / Cost (GH₵)</label>
+                                    <input type="number" step="0.01" min="0" x-model="referralForm.amount" placeholder="e.g. 0.00" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
+                                    <span class="text-[10px] text-slate-400">Auto-calculated if empty.</span>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 text-xs font-bold mb-1">Payment Status</label>
+                                    <select x-model="referralForm.payment_status" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
+                                        <option value="unpaid">Unpaid</option>
+                                        <option value="paid">Paid</option>
+                                        <option value="n_a">N/A / Waived</option>
+                                    </select>
+                                    <span class="text-[10px] text-slate-400">Incoming auto-pays.</span>
+                                </div>
+                            </div>
                             <div>
                                 <label class="block text-slate-300 text-xs font-bold mb-1">Referral Dispatch Status</label>
                                 <select x-model="referralForm.status" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
@@ -1820,6 +1909,124 @@
                                 <button type="button" @click="showReferralModal = false" class="py-3 px-6 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-sm transition-all">Cancel</button>
                             </div>
                         </form>
+                    </div>
+                </div>
+
+                <!-- Partner Ledger Modal -->
+                <div x-show="showLedgerModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" x-cloak>
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-4xl w-full shadow-2xl overflow-y-auto max-h-[90vh]">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="text-xl font-extrabold text-white" x-text="ledgerReport.partner_name + ' - Financial Statement'"></h3>
+                                <p class="text-slate-400 text-xs mt-1">Referral Partnership Ledger & Commission Statement</p>
+                            </div>
+                            <button type="button" @click="showLedgerModal = false" class="p-2 text-slate-400 hover:text-white rounded-lg bg-slate-800">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Financial Summary Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <!-- Incoming Referrals (Owed by Lab to Partner) -->
+                            <div class="bg-slate-950/40 border border-slate-800 p-6 rounded-2xl">
+                                <h4 class="text-xs font-bold uppercase text-emerald-400 tracking-wider mb-4">Incoming Cases (Referrals to Us)</h4>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-slate-500 text-[10px] uppercase font-bold">Total Cases</p>
+                                        <p class="text-xl font-extrabold text-white" x-text="ledgerReport.incoming ? ledgerReport.incoming.total_cases : 0"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-slate-500 text-[10px] uppercase font-bold">Total Commission</p>
+                                        <p class="text-xl font-extrabold text-white" x-text="'GH₵' + parseFloat(ledgerReport.incoming ? ledgerReport.incoming.total_commission : 0).toFixed(2)"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-emerald-500/80 text-[10px] uppercase font-bold">Settled (Paid)</p>
+                                        <p class="text-xl font-extrabold text-emerald-400" x-text="'GH₵' + parseFloat(ledgerReport.incoming ? ledgerReport.incoming.paid_commission : 0).toFixed(2)"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-rose-500/80 text-[10px] uppercase font-bold">Outstanding</p>
+                                        <p class="text-xl font-extrabold text-rose-400" x-text="'GH₵' + parseFloat(ledgerReport.incoming ? ledgerReport.incoming.unpaid_commission : 0).toFixed(2)"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Outgoing Referrals (Owed by Lab to External Partner) -->
+                            <div class="bg-slate-950/40 border border-slate-800 p-6 rounded-2xl">
+                                <h4 class="text-xs font-bold uppercase text-indigo-400 tracking-wider mb-4">Outgoing Cases (Referrals to Partner)</h4>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-slate-500 text-[10px] uppercase font-bold">Total Cases</p>
+                                        <p class="text-xl font-extrabold text-white" x-text="ledgerReport.outgoing ? ledgerReport.outgoing.total_cases : 0"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-slate-500 text-[10px] uppercase font-bold">Total Cost</p>
+                                        <p class="text-xl font-extrabold text-white" x-text="'GH₵' + parseFloat(ledgerReport.outgoing ? ledgerReport.outgoing.total_cost : 0).toFixed(2)"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-emerald-500/80 text-[10px] uppercase font-bold">Settled (Paid)</p>
+                                        <p class="text-xl font-extrabold text-emerald-400" x-text="'GH₵' + parseFloat(ledgerReport.outgoing ? ledgerReport.outgoing.paid_cost : 0).toFixed(2)"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-rose-500/80 text-[10px] uppercase font-bold">Outstanding</p>
+                                        <p class="text-xl font-extrabold text-rose-450" x-text="'GH₵' + parseFloat(ledgerReport.outgoing ? ledgerReport.outgoing.unpaid_cost : 0).toFixed(2)"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Partner Case List inside modal -->
+                        <h4 class="text-sm font-bold text-white mb-3">Case History</h4>
+                        <div class="overflow-x-auto max-h-60 border border-slate-800 rounded-xl">
+                            <table class="w-full text-xs text-left">
+                                <thead class="text-slate-400 uppercase bg-slate-950/20 border-b border-slate-800">
+                                    <tr>
+                                        <th class="py-2.5 px-3">Date</th>
+                                        <th class="py-2.5 px-3">Type</th>
+                                        <th class="py-2.5 px-3">Investigation</th>
+                                        <th class="py-2.5 px-3">Cost / Disc</th>
+                                        <th class="py-2.5 px-3">Commission</th>
+                                        <th class="py-2.5 px-3">Payment</th>
+                                        <th class="py-2.5 px-3 text-right">Logistical Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="ref in getPartnerReferralCases(ledgerReport.partner_id)" :key="ref.id">
+                                        <tr class="border-b border-slate-800/30 hover:bg-slate-800/20">
+                                            <td class="py-2.5 px-3 text-slate-400" x-text="new Date(ref.referral_date).toLocaleDateString()"></td>
+                                            <td class="py-2.5 px-3">
+                                                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border"
+                                                    :class="ref.referral_type === 'outgoing' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'"
+                                                    x-text="ref.referral_type">
+                                                </span>
+                                            </td>
+                                            <td class="py-2.5 px-3 font-semibold text-white" x-text="ref.requested_test_detail ? ref.requested_test_detail.test_detail.name : 'Unknown'"></td>
+                                            <td class="py-2.5 px-3 text-white" x-text="'GH₵' + parseFloat(ref.amount || 0).toFixed(2)"></td>
+                                            <td class="py-2.5 px-3 text-indigo-400" x-text="ref.referral_type === 'incoming' ? 'GH₵' + parseFloat(ref.commission_amount || 0).toFixed(2) : '-'"></td>
+                                            <td class="py-2.5 px-3">
+                                                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border"
+                                                    :class="ref.payment_status === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
+                                                            ref.payment_status === 'unpaid' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' : 
+                                                            'bg-slate-500/10 text-slate-400 border-slate-500/20'"
+                                                    x-text="ref.payment_status">
+                                                </span>
+                                            </td>
+                                            <td class="py-2.5 px-3 text-right">
+                                                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border"
+                                                    :class="ref.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
+                                                            ref.status === 'sent' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 
+                                                            'bg-amber-500/10 text-amber-400 border-amber-500/20'"
+                                                    x-text="ref.status">
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="flex justify-end pt-4 mt-6 border-t border-slate-800">
+                            <button type="button" @click="showLedgerModal = false" class="py-2.5 px-6 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-sm transition-all">Close</button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -2865,8 +3072,10 @@
                 partnerList: [],
                 pendingTestsList: [],
                 showReferralModal: false,
-                partnerForm: { name: '', contact_number: '', email: '' },
-                referralForm: { partner: '', requested_test: '', referral_type: 'outgoing', status: 'pending' },
+                showLedgerModal: false,
+                ledgerReport: {},
+                partnerForm: { name: '', contact_number: '', email: '', discount_percentage: 0.00, commission_rate: 0.00 },
+                referralForm: { partner: '', requested_test: '', referral_type: 'outgoing', status: 'pending', amount: 0.00, payment_status: 'unpaid' },
 
                 // Phase 3 Variables
                 userRole: '{{ user.role }}',
@@ -3917,7 +4126,7 @@
                     .then(r => r.json())
                     .then(() => {
                         alert('Referral partner registered!');
-                        this.partnerForm = { name: '', contact_number: '', email: '' };
+                        this.partnerForm = { name: '', contact_number: '', email: '', discount_percentage: 0.00, commission_rate: 0.00 };
                         this.fetchReferrals();
                     });
                 },
@@ -3937,8 +4146,37 @@
                     .then(() => {
                         alert('Referral case registered successfully!');
                         this.showReferralModal = false;
-                        this.referralForm = { partner: '', requested_test: '', referral_type: 'outgoing', status: 'pending' };
+                        this.referralForm = { partner: '', requested_test: '', referral_type: 'outgoing', status: 'pending', amount: 0.00, payment_status: 'unpaid' };
                         this.fetchReferrals();
+                    });
+                },
+                openLedgerModal(partnerId) {
+                    fetch(`/api/referral-partners/${partnerId}/ledger/`)
+                        .then(r => r.json())
+                        .then(data => {
+                            this.ledgerReport = data;
+                            this.ledgerReport.partner_id = partnerId;
+                            this.showLedgerModal = true;
+                        });
+                },
+                getPartnerReferralCases(partnerId) {
+                    return this.referralsList.filter(r => r.partner == partnerId);
+                },
+                settleReferralPayment(referralId) {
+                    if (!confirm("Are you sure you want to mark this referral case payment as PAID?")) return;
+                    fetch(`/api/referrals/${referralId}/mark_paid/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        }
+                    })
+                    .then(r => r.json())
+                    .then(() => {
+                        alert('Referral payment marked as paid.');
+                        this.fetchReferrals();
+                        if (this.showLedgerModal && this.ledgerReport.partner_id) {
+                            this.openLedgerModal(this.ledgerReport.partner_id);
+                        }
                     });
                 },
 

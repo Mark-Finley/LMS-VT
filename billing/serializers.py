@@ -10,7 +10,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invoice
         fields = '__all__'
-        read_only_fields = ['id', 'uuid', 'created_at', 'updated_at', 'created_by', 'updated_by', 'is_deleted', 'total_amount', 'payable_amount', 'paid_amount', 'balance_due', 'payment_status']
+        read_only_fields = ['id', 'uuid', 'created_at', 'updated_at', 'created_by', 'updated_by', 'is_deleted', 'total_amount', 'payable_amount', 'paid_amount', 'balance_due', 'payment_status', 'referral_discount']
 
 class PaymentSerializer(serializers.ModelSerializer):
     received_by_name = serializers.CharField(source='received_by.username', read_only=True)

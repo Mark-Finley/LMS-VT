@@ -29,25 +29,33 @@ class Command(BaseCommand):
                 'name': 'St. Jude Reference Laboratory',
                 'contact_number': '+1 555-9302',
                 'email': 'referrals@stjude.org',
-                'address': '456 Medical Parkway, Memphis'
+                'address': '456 Medical Parkway, Memphis',
+                'discount_percentage': 15.00,
+                'commission_rate': 10.00
             },
             {
                 'name': 'Metropolis Clinical Laboratories',
                 'contact_number': '+1 555-4920',
                 'email': 'partner@metropolis.com',
-                'address': '789 Diagnostics Blvd, Metropolis'
+                'address': '789 Diagnostics Blvd, Metropolis',
+                'discount_percentage': 10.00,
+                'commission_rate': 8.00
             },
             {
                 'name': 'Synlab International',
                 'contact_number': '+233 24 123 4567',
                 'email': 'info.ghana@synlab.com',
-                'address': '12 Ring Road East, Accra'
+                'address': '12 Ring Road East, Accra',
+                'discount_percentage': 12.00,
+                'commission_rate': 5.00
             },
             {
                 'name': 'Lancet Laboratories',
                 'contact_number': '+233 30 261 0480',
                 'email': 'referrals@lancet.com.gh',
-                'address': '34 Kojo Thompson Rd, Adabraka, Accra'
+                'address': '34 Kojo Thompson Rd, Adabraka, Accra',
+                'discount_percentage': 20.00,
+                'commission_rate': 12.00
             },
         ]
 
@@ -59,16 +67,24 @@ class Command(BaseCommand):
                     'contact_number': p_data['contact_number'],
                     'email': p_data['email'],
                     'address': p_data['address'],
+                    'discount_percentage': p_data['discount_percentage'],
+                    'commission_rate': p_data['commission_rate'],
                     'created_by': admin_user,
                     'updated_by': admin_user,
                     'status': 'active'
                 }
             )
+            # If not created, let's update rates to match
+            if not created:
+                partner.discount_percentage = p_data['discount_percentage']
+                partner.commission_rate = p_data['commission_rate']
+                partner.save()
+
             partners.append(partner)
             if created:
                 self.stdout.write(self.style.SUCCESS(f"Created partner: {partner.name}"))
             else:
-                self.stdout.write(f"Partner already exists: {partner.name}")
+                self.stdout.write(f"Partner already exists (updated rates): {partner.name}")
 
         self.stdout.write("Checking for existing requested tests...")
         requested_tests = list(RequestedTest.objects.all())
@@ -150,6 +166,7 @@ class Command(BaseCommand):
         }
 
         created_count = 0
+        from decimal import Decimal
         for rt in selected_tests:
             # Avoid duplicate referrals for the same requested test
             if Referral.objects.filter(requested_test=rt).exists():
@@ -160,12 +177,22 @@ class Command(BaseCommand):
             partner = random.choice(partners)
             notes = random.choice(referral_notes[ref_type])
             
+            # Setup default amount for outgoing
+            amount = Decimal('0.00')
+            payment_status = Referral.PAYMENT_STATUS_UNPAID
+            if ref_type == Referral.TYPE_OUTGOING:
+                amount = Decimal(str(random.randint(50, 150) + 0.00))
+                if status == Referral.STATUS_COMPLETED:
+                    payment_status = Referral.PAYMENT_STATUS_PAID
+            
             Referral.objects.create(
                 requested_test=rt,
                 partner=partner,
                 referral_type=ref_type,
                 status=status,
                 notes=notes,
+                amount=amount,
+                payment_status=payment_status,
                 created_by=admin_user,
                 updated_by=admin_user
             )

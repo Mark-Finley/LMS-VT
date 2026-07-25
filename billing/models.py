@@ -20,6 +20,7 @@ class Invoice(BaseModel):
     
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    referral_discount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     tax_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     payable_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     
@@ -35,12 +36,21 @@ class Invoice(BaseModel):
         total = Decimal(str(sum(rt.price_at_request for rt in requested_tests) or '0.00'))
         self.total_amount = total
         
+        # Calculate auto-discount from incoming referrals
+        ref_discount_sum = Decimal('0.00')
+        for rt in requested_tests:
+            referral = rt.referrals.filter(referral_type='incoming', is_deleted=False).first()
+            if referral and referral.partner.discount_percentage > 0:
+                ref_discount_sum += rt.price_at_request * (Decimal(str(referral.partner.discount_percentage)) / Decimal('100.00'))
+        
+        self.referral_discount = ref_discount_sum
+        
         # Cast to Decimal in case float defaults persist during creation
         discount = Decimal(str(self.discount_amount or '0.00'))
         tax = Decimal(str(self.tax_amount or '0.00'))
         paid = Decimal(str(self.paid_amount or '0.00'))
         
-        self.payable_amount = total - discount + tax
+        self.payable_amount = total - discount - self.referral_discount + tax
         self.balance_due = self.payable_amount - paid
         
         if paid <= 0:
@@ -100,6 +110,17 @@ class Payment(BaseModel):
         request = invoice.request
         if invoice.payment_status == Invoice.STATUS_PAID:
             request.payment_status = TestRequest.PAYMENT_PAID
+            
+            # Automatically update incoming referrals to Paid
+            from referrals.models import Referral
+            from django.utils import timezone
+            Referral.objects.filter(
+                requested_test__request=invoice.request,
+                referral_type=Referral.TYPE_INCOMING
+            ).update(
+                payment_status=Referral.PAYMENT_STATUS_PAID,
+                payment_date=timezone.now()
+            )
         elif invoice.payment_status == Invoice.STATUS_PARTIAL:
             request.payment_status = TestRequest.PAYMENT_PARTIAL
         else:
