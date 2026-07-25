@@ -473,64 +473,18 @@
                 </div>
             </section>
 
-            <!-- 2. RECEPTION & PATIENT REGISTRATION -->
-            <section x-show="currentTab === 'reception' && hasTabAccess('reception')" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Registration Form -->
-                <div class="lg:col-span-1 bg-slate-900 border border-slate-800 rounded-3xl p-6 h-fit">
-                    <h2 class="text-lg font-bold text-white mb-6">Register Patient & Create Visit</h2>
-                    <form @submit.prevent="registerPatient()" class="space-y-4">
-                        <div>
-                            <label class="block text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">First Name</label>
-                            <input type="text" x-model="patientForm.first_name" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label class="block text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">Last Name</label>
-                            <input type="text" x-model="patientForm.last_name" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-indigo-500">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">Gender</label>
-                                <select x-model="patientForm.gender" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-indigo-500">
-                                    <option value="M">Male</option>
-                                    <option value="F">Female</option>
-                                    <option value="O">Other</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">Date of Birth</label>
-                                <input type="date" x-model="patientForm.date_of_birth" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-indigo-500">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">Phone Number</label>
-                            <input type="text" x-model="patientForm.phone_number" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label class="block text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">Encounter Type</label>
-                            <select x-model="encounterForm.encounter_type" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-indigo-500">
-                                <option value="walk_in">Walk-in</option>
-                                <option value="outpatient">Outpatient</option>
-                                <option value="inpatient">Inpatient</option>
-                                <option value="emergency">Emergency</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">Referring Physician</label>
-                            <input type="text" x-model="encounterForm.referring_physician" placeholder="Self/Dr. Smith" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-indigo-500">
-                        </div>
-                        <div class="pt-4">
-                            <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg transition-all">
-                                Register Patient & Visit
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
+            <section x-show="currentTab === 'reception' && hasTabAccess('reception')" class="space-y-6">
                 <!-- Patient Database / Visits & Request Tests -->
-                <div class="lg:col-span-2 space-y-6">
+                <div class="space-y-6">
                     <!-- Patient Search & Selection -->
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-                        <h2 class="text-lg font-bold text-white mb-4">Patient Directory</h2>
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-lg font-bold text-white">Patient Directory</h2>
+                            <button type="button" @click="showRegisterPatientModal = true" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-750 text-white font-bold rounded-xl shadow-lg transition-all text-sm flex items-center space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                                <span>Register New Patient & Visit</span>
+                            </button>
+                        </div>
                         <div class="flex items-center space-x-2 mb-4">
                             <input type="text" x-model="patientSearchQuery" @input.debounce="patientPage = 1; fetchPatients()" placeholder="Search patient by ID, name or phone..." class="flex-1 px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none">
                         </div>
@@ -630,40 +584,230 @@
                     </div>
                 </div>
 
+                <!-- Register Patient & Visit Modal -->
+                <div x-show="showRegisterPatientModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" x-cloak>
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-4xl w-full shadow-2xl overflow-y-auto max-h-[90vh] space-y-6">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Register Patient & Create Visit</h3>
+                                <p class="text-xs text-slate-400 mt-1">Fill out the patient demographics, contact details, insurance, and encounter options.</p>
+                            </div>
+                            <button type="button" @click="showRegisterPatientModal = false" class="p-2 text-slate-400 hover:text-white rounded-lg bg-slate-800">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+
+                        <form @submit.prevent="registerPatient()" class="space-y-6 text-left">
+                            <!-- Demographics -->
+                            <div class="space-y-3">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-400 border-b border-slate-800/60 pb-1">Personal Demographics</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">First Name *</label>
+                                        <input type="text" x-model="patientForm.first_name" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Middle Name</label>
+                                        <input type="text" x-model="patientForm.middle_name" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Last Name *</label>
+                                        <input type="text" x-model="patientForm.last_name" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Gender *</label>
+                                        <select x-model="patientForm.gender" required class="w-full px-3 py-2 bg-slate-805 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                            <option value="M">Male</option>
+                                            <option value="F">Female</option>
+                                            <option value="O">Other</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Date of Birth *</label>
+                                        <input type="date" x-model="patientForm.date_of_birth" required class="w-full px-3 py-2 bg-slate-805 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Phone Number *</label>
+                                        <input type="text" x-model="patientForm.phone_number" required class="w-full px-3 py-2 bg-slate-850 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Email Address</label>
+                                        <input type="email" x-model="patientForm.email" placeholder="patient@example.com" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Home Address</label>
+                                        <input type="text" x-model="patientForm.address" placeholder="Residential address" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Emergency & Insurance -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-3 bg-slate-950/20 p-4 rounded-2xl border border-slate-800">
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-400 pb-1">Emergency Contact</h4>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Contact Name</label>
+                                        <input type="text" x-model="patientForm.emergency_contact_name" placeholder="Full Name" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Contact Phone</label>
+                                        <input type="text" x-model="patientForm.emergency_contact_phone" placeholder="Phone Number" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                </div>
+
+                                <div class="space-y-3 bg-slate-950/20 p-4 rounded-2xl border border-slate-800">
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-400 pb-1">Insurance Information</h4>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Insurance Provider</label>
+                                        <input type="text" x-model="patientForm.insurance_provider" placeholder="NHIS / Health Insurance" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Policy Number</label>
+                                        <input type="text" x-model="patientForm.insurance_policy_number" placeholder="Policy Number" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Visit Details -->
+                            <div class="space-y-3">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-400 border-b border-slate-800/60 pb-1">Visit Intake & Medical History</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Encounter Type *</label>
+                                        <select x-model="encounterForm.encounter_type" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                            <option value="walk_in">Walk-in</option>
+                                            <option value="outpatient">Outpatient</option>
+                                            <option value="inpatient">Inpatient</option>
+                                            <option value="emergency">Emergency</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Referring Physician</label>
+                                        <input type="text" x-model="encounterForm.referring_physician" placeholder="Self/Dr. Smith" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-300 text-xs font-semibold mb-1">Relevant Medical History</label>
+                                    <textarea x-model="patientForm.medical_history" rows="3" placeholder="Allergies, chronic conditions, etc..." class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white resize-none focus:outline-none"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex space-x-2 pt-4 border-t border-slate-800">
+                                <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg transition-all text-sm">
+                                    Register Patient & Visit
+                                </button>
+                                <button type="button" @click="showRegisterPatientModal = false" class="py-3 px-6 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-sm">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
                 <!-- Edit Patient Modal Overlay -->
                 <div x-show="showEditPatientModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" x-cloak>
-                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4">
-                        <h3 class="text-lg font-bold text-white">Edit Patient Information</h3>
-                        <form @submit.prevent="updatePatient()" class="space-y-4 text-left">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">First Name</label>
-                                    <input type="text" x-model="editPatientForm.first_name" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">Last Name</label>
-                                    <input type="text" x-model="editPatientForm.last_name" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none">
-                                </div>
-                            </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-4xl w-full shadow-2xl overflow-y-auto max-h-[90vh] space-y-6">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-4">
                             <div>
-                                <label class="block text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">Phone Number</label>
-                                <input type="text" x-model="editPatientForm.phone_number" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none">
+                                <h3 class="text-xl font-bold text-white">Edit Patient Information</h3>
+                                <p class="text-xs text-slate-400 mt-1">Update demographics, contact details, insurance, and medical history.</p>
                             </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">Gender</label>
-                                    <select x-model="editPatientForm.gender" class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none">
-                                        <option value="M">Male</option>
-                                        <option value="F">Female</option>
-                                        <option value="O">Other</option>
-                                    </select>
+                            <button type="button" @click="showEditPatientModal = false" class="p-2 text-slate-400 hover:text-white rounded-lg bg-slate-800">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+
+                        <form @submit.prevent="updatePatient()" class="space-y-6 text-left">
+                            <!-- Demographics -->
+                            <div class="space-y-3">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400 border-b border-slate-800/60 pb-1">Personal Demographics</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">First Name *</label>
+                                        <input type="text" x-model="editPatientForm.first_name" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Middle Name</label>
+                                        <input type="text" x-model="editPatientForm.middle_name" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Last Name *</label>
+                                        <input type="text" x-model="editPatientForm.last_name" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">Date of Birth</label>
-                                    <input type="date" x-model="editPatientForm.date_of_birth" required class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Gender *</label>
+                                        <select x-model="editPatientForm.gender" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                            <option value="M">Male</option>
+                                            <option value="F">Female</option>
+                                            <option value="O">Other</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Date of Birth *</label>
+                                        <input type="date" x-model="editPatientForm.date_of_birth" required class="w-full px-3 py-2 bg-slate-805 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Phone Number *</label>
+                                        <input type="text" x-model="editPatientForm.phone_number" required class="w-full px-3 py-2 bg-slate-850 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Email Address</label>
+                                        <input type="email" x-model="editPatientForm.email" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Home Address</label>
+                                        <input type="text" x-model="editPatientForm.address" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex space-x-2 pt-2">
+
+                            <!-- Emergency & Insurance -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-3 bg-slate-950/20 p-4 rounded-2xl border border-slate-800">
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400 pb-1">Emergency Contact</h4>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Contact Name</label>
+                                        <input type="text" x-model="editPatientForm.emergency_contact_name" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Contact Phone</label>
+                                        <input type="text" x-model="editPatientForm.emergency_contact_phone" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                </div>
+
+                                <div class="space-y-3 bg-slate-950/20 p-4 rounded-2xl border border-slate-800">
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400 pb-1">Insurance Information</h4>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Insurance Provider</label>
+                                        <input type="text" x-model="editPatientForm.insurance_provider" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-300 text-xs font-semibold mb-1">Policy Number</label>
+                                        <input type="text" x-model="editPatientForm.insurance_policy_number" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Medical History -->
+                            <div class="space-y-3">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400 border-b border-slate-800/60 pb-1">Medical Records</h4>
+                                <div>
+                                    <label class="block text-slate-300 text-xs font-semibold mb-1">Relevant Medical History</label>
+                                    <textarea x-model="editPatientForm.medical_history" rows="3" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white resize-none focus:outline-none"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex space-x-2 pt-4 border-t border-slate-800">
                                 <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg transition-all text-sm">
                                     Save Changes
                                 </button>
@@ -2923,8 +3067,9 @@
                 catalogueTotalPages: 1,
 
                 // Editing Modal Flags and Form states
+                showRegisterPatientModal: false,
                 showEditPatientModal: false,
-                editPatientForm: { id: null, first_name: '', last_name: '', gender: 'M', date_of_birth: '', phone_number: '' },
+                editPatientForm: { id: null, first_name: '', middle_name: '', last_name: '', gender: 'M', date_of_birth: '', phone_number: '', email: '', address: '', insurance_provider: '', insurance_policy_number: '', emergency_contact_name: '', emergency_contact_phone: '', medical_history: '' },
 
                 showEditTestModal: false,
                 editTestForm: { id: null, name: '', code: '', price: 0.00, category: '', turnaround_time_hours: 4, sample_type: 'Serum', normal_range: '', units: '' },
@@ -2983,10 +3128,18 @@
                 
                 patientForm: {
                     first_name: '',
+                    middle_name: '',
                     last_name: '',
                     gender: 'M',
                     date_of_birth: '',
-                    phone_number: ''
+                    phone_number: '',
+                    email: '',
+                    address: '',
+                    insurance_provider: '',
+                    insurance_policy_number: '',
+                    emergency_contact_name: '',
+                    emergency_contact_phone: '',
+                    medical_history: ''
                 },
                 encounterForm: {
                     encounter_type: 'walk_in',
@@ -3456,10 +3609,18 @@
                     this.editPatientForm = {
                         id: patient.id,
                         first_name: patient.first_name,
+                        middle_name: patient.middle_name || '',
                         last_name: patient.last_name,
                         gender: patient.gender,
                         date_of_birth: patient.date_of_birth,
-                        phone_number: patient.phone_number
+                        phone_number: patient.phone_number,
+                        email: patient.email || '',
+                        address: patient.address || '',
+                        insurance_provider: patient.insurance_provider || '',
+                        insurance_policy_number: patient.insurance_policy_number || '',
+                        emergency_contact_name: patient.emergency_contact_name || '',
+                        emergency_contact_phone: patient.emergency_contact_phone || '',
+                        medical_history: patient.medical_history || ''
                     };
                     this.showEditPatientModal = true;
                 },
@@ -3638,8 +3799,23 @@
                     .then(() => {
                         alert('Patient registered and visit created successfully!');
                         // Reset Forms
-                        this.patientForm = { first_name: '', last_name: '', gender: 'M', date_of_birth: '', phone_number: '' };
+                        this.patientForm = {
+                            first_name: '',
+                            middle_name: '',
+                            last_name: '',
+                            gender: 'M',
+                            date_of_birth: '',
+                            phone_number: '',
+                            email: '',
+                            address: '',
+                            insurance_provider: '',
+                            insurance_policy_number: '',
+                            emergency_contact_name: '',
+                            emergency_contact_phone: '',
+                            medical_history: ''
+                        };
                         this.encounterForm = { encounter_type: 'walk_in', referring_physician: '' };
+                        this.showRegisterPatientModal = false;
                         this.fetchPatients();
                         this.fetchMetrics();
                     });
