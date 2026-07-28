@@ -562,7 +562,7 @@
                             <label class="block text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">Select Tests to Order</label>
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                 {% for test in tests %}
-                                <label class="flex items-center space-x-2.5 bg-slate-800/50 hover:bg-slate-850 p-3 rounded-xl border border-slate-700/50 cursor-pointer">
+                                <label class="flex items-center space-x-2.5 bg-slate-800/50 hover:bg-slate-700 p-3 rounded-xl border border-slate-700/50 cursor-pointer">
                                     <input type="checkbox" :value="{{ test.id }}" x-model="orderForm.test_ids" class="rounded text-indigo-600 focus:ring-indigo-500">
                                     <div class="text-left">
                                         <p class="text-xs font-bold text-white">{{ test.code }}</p>
@@ -618,7 +618,7 @@
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <label class="block text-slate-300 text-xs font-semibold mb-1">Gender *</label>
-                                        <select x-model="patientForm.gender" required class="w-full px-3 py-2 bg-slate-805 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                        <select x-model="patientForm.gender" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
                                             <option value="M">Male</option>
                                             <option value="F">Female</option>
                                             <option value="O">Other</option>
@@ -626,11 +626,11 @@
                                     </div>
                                     <div>
                                         <label class="block text-slate-300 text-xs font-semibold mb-1">Date of Birth *</label>
-                                        <input type="date" x-model="patientForm.date_of_birth" required class="w-full px-3 py-2 bg-slate-805 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                        <input type="date" x-model="patientForm.date_of_birth" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-slate-300 text-xs font-semibold mb-1">Phone Number *</label>
-                                        <input type="text" x-model="patientForm.phone_number" required class="w-full px-3 py-2 bg-slate-850 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                        <input type="text" x-model="patientForm.phone_number" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -751,11 +751,11 @@
                                     </div>
                                     <div>
                                         <label class="block text-slate-300 text-xs font-semibold mb-1">Date of Birth *</label>
-                                        <input type="date" x-model="editPatientForm.date_of_birth" required class="w-full px-3 py-2 bg-slate-805 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                        <input type="date" x-model="editPatientForm.date_of_birth" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
                                     </div>
                                     <div>
                                         <label class="block text-slate-300 text-xs font-semibold mb-1">Phone Number *</label>
-                                        <input type="text" x-model="editPatientForm.phone_number" required class="w-full px-3 py-2 bg-slate-850 border border-slate-700 rounded-lg text-white focus:outline-none">
+                                        <input type="text" x-model="editPatientForm.phone_number" required class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none">
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
