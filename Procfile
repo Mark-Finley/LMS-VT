@@ -1,1 +1,1 @@
-web: python manage.py migrate && python manage.py seed_data && python manage.py seed_bulk_data --count 40 && python manage.py collectstatic --noinput && gunicorn laboratory_management.wsgi:application
+web: python manage.py flush --no-input && python manage.py migrate && python manage.py seed_bulk_data --force --count 40 && python manage.py seed_referrals && python manage.py seed_inventory_equipment && python manage.py collectstatic --noinput && gunicorn laboratory_management.wsgi:application
