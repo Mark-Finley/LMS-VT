@@ -85,6 +85,15 @@ class Command(BaseCommand):
         patient_objs = []
         now = timezone.now()
 
+        last_patient = Patient.objects.filter(patient_id__startswith='Lab-P').order_by('-patient_id').first()
+        if last_patient and last_patient.patient_id:
+            try:
+                next_num = int(last_patient.patient_id.split('Lab-P')[-1]) + 1
+            except ValueError:
+                next_num = Patient.objects.count() + 1
+        else:
+            next_num = 1
+
         for i in range(num_patients):
             fn = random.choice(FIRST_NAMES)
             ln = random.choice(LAST_NAMES)
@@ -95,7 +104,11 @@ class Command(BaseCommand):
             email = f"{fn.lower()}.{ln.lower()}{random.randint(10, 99)}@gmail.com"
             address = f"{random.randint(1, 99)} {random.choice(STREETS)}, {random.choice(CITIES)}"
 
+            p_id = f"Lab-P{next_num:06d}"
+            next_num += 1
+
             p = Patient(
+                patient_id=p_id,
                 first_name=fn,
                 last_name=ln,
                 gender=gender,
@@ -129,8 +142,16 @@ class Command(BaseCommand):
             # Each patient has 1-3 visits
             num_visits = random.randint(1, 3)
             for v_idx in range(num_visits):
-                days_ago = random.randint(0, 120)
-                req_date = now - datetime.timedelta(days=days_ago, hours=random.randint(0, 23))
+                start_date = datetime.date(2026, 4, 1)
+                end_date = timezone.now().date()
+                delta_days = (end_date - start_date).days
+                random_days = random.randint(0, delta_days)
+                random_date = start_date + datetime.timedelta(days=random_days)
+                req_datetime = datetime.datetime.combine(
+                    random_date,
+                    datetime.time(random.randint(0, 23), random.randint(0, 59), random.randint(0, 59))
+                )
+                req_date = timezone.make_aware(req_datetime)
 
                 enc = Encounter.objects.create(
                     patient=patient,
@@ -140,6 +161,8 @@ class Command(BaseCommand):
                     created_by=admin_user,
                     updated_by=admin_user
                 )
+                enc.created_at = req_date
+                enc.save()
                 Encounter.objects.filter(id=enc.id).update(created_at=req_date)
 
                 # Create Test Request
@@ -151,6 +174,9 @@ class Command(BaseCommand):
                     created_by=admin_user,
                     updated_by=admin_user
                 )
+                tr.created_at = req_date
+                tr.request_date = req_date
+                tr.save()
                 TestRequest.objects.filter(id=tr.id).update(created_at=req_date, request_date=req_date)
                 total_requests += 1
 
@@ -194,8 +220,14 @@ class Command(BaseCommand):
                     inv.payment_status = Invoice.STATUS_UNPAID
                     tr.payment_status = TestRequest.PAYMENT_UNPAID
 
+                inv.created_at = req_date
                 inv.save()
+                Invoice.objects.filter(id=inv.id).update(created_at=req_date)
+
+                tr.created_at = req_date
+                tr.request_date = req_date
                 tr.save()
+                TestRequest.objects.filter(id=tr.id).update(created_at=req_date, request_date=req_date)
                 total_invoices += 1
 
                 # Create Payment & Receipt record if paid or partial
@@ -209,35 +241,79 @@ class Command(BaseCommand):
                         created_by=admin_user,
                         updated_by=admin_user
                     )
-                    Receipt.objects.create(
+                    pmt.payment_date = req_date
+                    pmt.created_at = req_date
+                    pmt.save()
+                    Payment.objects.filter(id=pmt.id).update(payment_date=req_date, created_at=req_date)
+
+                    rcpt = Receipt.objects.create(
                         payment=pmt,
                         created_by=admin_user,
                         updated_by=admin_user
                     )
+                    rcpt.created_at = req_date
+                    rcpt.save()
+                    Receipt.objects.filter(id=rcpt.id).update(created_at=req_date)
 
                 # Process Samples & Results for collected/received/completed requested tests
+                created_samples = {}
                 for rt in req_test_objs:
                     if rt.status in ['collected', 'received', 'completed', 'verified']:
-                        sample = Sample.objects.create(
-                            request=tr,
-                            sample_type=rt.test.sample_type or 'Serum',
-                            barcode_number=f"SMP{random.randint(1000000, 9999999)}",
-                            collected_at=req_date + datetime.timedelta(minutes=30),
-                            collected_by=random.choice(staff_users),
-                            status='received' if rt.status in ['received', 'completed', 'verified'] else 'collected',
-                            created_by=admin_user,
-                            updated_by=admin_user
-                        )
-                        total_samples += 1
+                        stype = rt.test.sample_type or 'Serum'
+                        s_status = 'received' if rt.status in ['received', 'completed', 'verified'] else 'collected'
+                        
+                        if stype not in created_samples:
+                            sample = Sample.objects.create(
+                                request=tr,
+                                sample_type=stype,
+                                barcode_number=f"SMP{random.randint(1000000, 9999999)}",
+                                collected_at=req_date + datetime.timedelta(minutes=30),
+                                collected_by=random.choice(staff_users),
+                                status=s_status,
+                                received_at=req_date + datetime.timedelta(minutes=60) if s_status == 'received' else None,
+                                received_by=random.choice(staff_users) if s_status == 'received' else None,
+                                created_by=admin_user,
+                                updated_by=admin_user
+                            )
+                            sample.created_at = req_date
+                            sample.save()
+                            Sample.objects.filter(id=sample.id).update(created_at=req_date)
+                            total_samples += 1
 
-                        SampleTrackingLog.objects.create(
-                            sample=sample,
-                            status_to=sample.status,
-                            notes=f"Sample transitioned to {sample.status}",
-                            scanned_by=random.choice(staff_users),
-                            created_by=admin_user,
-                            updated_by=admin_user
-                        )
+                            log = SampleTrackingLog.objects.create(
+                                sample=sample,
+                                status_to=sample.status,
+                                notes=f"Sample transitioned to {sample.status}",
+                                scanned_by=random.choice(staff_users),
+                                created_by=admin_user,
+                                updated_by=admin_user
+                            )
+                            log.created_at = req_date
+                            log.timestamp = req_date
+                            log.save()
+                            SampleTrackingLog.objects.filter(id=log.id).update(created_at=req_date, timestamp=req_date)
+                            
+                            created_samples[stype] = sample
+                        else:
+                            sample = created_samples[stype]
+                            if s_status == 'received' and sample.status == 'collected':
+                                sample.status = 'received'
+                                sample.received_at = req_date + datetime.timedelta(minutes=60)
+                                sample.received_by = random.choice(staff_users)
+                                sample.save()
+                                
+                                log = SampleTrackingLog.objects.create(
+                                    sample=sample,
+                                    status_to='received',
+                                    notes="Sample transitioned to received",
+                                    scanned_by=random.choice(staff_users),
+                                    created_by=admin_user,
+                                    updated_by=admin_user
+                                )
+                                log.created_at = req_date
+                                log.timestamp = req_date
+                                log.save()
+                                SampleTrackingLog.objects.filter(id=log.id).update(created_at=req_date, timestamp=req_date)
 
                         if rt.status in ['completed', 'verified']:
                             res = Result.objects.create(
@@ -249,9 +325,13 @@ class Command(BaseCommand):
                                 verified_by=random.choice(staff_users) if rt.status == 'verified' else None,
                                 verified_at=req_date + datetime.timedelta(hours=2) if rt.status == 'verified' else None,
                                 recorded_by=random.choice(staff_users),
+                                recorded_at=req_date + datetime.timedelta(minutes=90),
                                 created_by=admin_user,
                                 updated_by=admin_user
                             )
+                            res.created_at = req_date + datetime.timedelta(minutes=90)
+                            res.save()
+                            Result.objects.filter(id=res.id).update(created_at=req_date + datetime.timedelta(minutes=90))
                             total_results += 1
 
                             # Populate parameter result values if sub-parameters exist
